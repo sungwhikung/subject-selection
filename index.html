@@ -5,431 +5,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>논산대건고등학교 교육과정 수강신청 포털</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-/* ==========================================
-   1. Design System & Tokens
-========================================== */
 :root {
-  --bg-color: #F8FAFC;
-  --surface: #FFFFFF;
-  --surface-hover: #F1F5F9;
-  --text-main: #0F172A;
-  --text-sub: #475569;
-  --text-muted: #94A3B8;
-  --border: #E2E8F0;
-  --border-focus: #94A3B8;
-  
-  --primary: #1E293B;
-  --primary-hover: #0F172A;
-  --accent: #2563EB;
-  --accent-light: #EFF6FF;
-  
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --danger-bg: #FEF2F2;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --navy: #1a3a5f; --gold: #d4af37; --bg: #f0f4f8;
+  --color-kor: #fff5f5; --color-math: #fff9db; --color-eng: #f1f3f5;
+  --color-soc: #e8f5e9; --color-sci: #e3f2fd;
+  --color-pe: #f3f0ff; --color-art: #fff0f6; --color-etc: #f8f9fa;
+  --surface: #ffffff; --border: #e2e8f0; --text-main: #0f172a; --text-sub: #475569;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
+body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
 
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
-input { font-family: inherit; }
-
-/* ==========================================
-   2. Screen Management
-========================================== */
-.screen { display: none !important; opacity: 0; transition: opacity 0.3s ease; }
+/* 화면 전환 */
+.screen { display: none !important; opacity: 0; transition: opacity 0.25s ease; }
 .screen.active { display: block !important; opacity: 1; }
 
-/* ==========================================
-   3. Login Screen
-========================================== */
-#sc-login {
-  min-height: 100vh;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
+/* 로그인 화면 */
+#sc-login { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 20px; }
 #sc-login:not(.active) { display: none !important; }
+.login-card { background: var(--surface); border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; border-top: 8px solid var(--navy); }
 
-.login-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 48px 40px;
-  max-width: 420px;
-  width: 100%;
-  box-shadow: var(--shadow-lg);
-  text-align: center;
-}
-.login-inst { font-size: 0.8rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
-.login-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
-.login-desc { font-size: 0.925rem; color: var(--text-sub); margin-bottom: 32px; }
-.login-divider { height: 1px; background: var(--border); margin: 28px 0; }
-.login-notice { font-size: 0.825rem; color: var(--text-muted); margin-bottom: 24px; }
-.login-status { margin-top: 20px; font-size: 0.875rem; font-weight: 500; min-height: 24px; }
-.login-status.error { color: var(--danger); }
-.login-status.success { color: var(--success); }
-
-/* ==========================================
-   4. Portal / Year Selection Screen
-========================================== */
-#sc-year {
-  min-height: 100vh;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-}
+/* 메뉴 화면 */
+#sc-year { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 40px 20px; }
 #sc-year:not(.active) { display: none !important; }
+.portal-container { max-width: 720px; width: 100%; }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+.menu-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); }
 
-.portal-container { max-width: 680px; width: 100%; }
-.portal-header { text-align: center; margin-bottom: 32px; }
-.portal-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-.portal-header p { color: var(--text-sub); font-size: 0.95rem; }
+/* 메인 앱 영역 */
+.app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px; }
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.btn-back { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-.user-badge-bar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
-}
-.user-info { display: flex; align-items: center; gap: 10px; font-size: 0.925rem; font-weight: 600; color: var(--text-main); }
-.user-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+/* 진로 입력 및 프리셋 바 */
+.career-input-area { background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.career-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.career-row input { flex: 1; padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.95em; outline: none; }
+.preset-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.preset-btn { padding: 6px 14px; border: 1px solid var(--navy); border-radius: 20px; background: var(--surface); cursor: pointer; font-size: 0.825em; font-weight: 600; transition: 0.2s; }
+.preset-btn:hover { background: var(--navy); color: white; }
 
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.menu-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px 24px;
-  text-align: left;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/* 대시보드 */
+.master-dashboard {
+  position: sticky; top: 12px; z-index: 50;
+  background: linear-gradient(135deg, #1a3a5f 0%, #102a43 100%);
+  color: white; padding: 20px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(26,58,95,0.25);
 }
-.menu-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-.menu-tag {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-light);
-  padding: 4px 10px;
-  border-radius: 20px;
-  margin-bottom: 16px;
-  width: fit-content;
-}
-.menu-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-.menu-card p { font-size: 0.875rem; color: var(--text-sub); line-height: 1.5; }
+.main-calc { display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.score-label { font-size: 0.8em; opacity: 0.8; display: block; margin-bottom: 2px; }
+.num { font-size: 1.7em; font-weight: 800; }
+.total { background: rgba(212, 175, 55, 0.2); padding: 6px 24px; border-radius: 12px; border: 1px solid var(--gold); }
+.sub-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.stat-card { background: rgba(255,255,255,0.06); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.stat-card .label { font-size: 0.72em; opacity: 0.75; display: block; }
+.stat-card .val { font-weight: 700; font-size: 1.05em; }
+.val.warning { color: #f87171 !important; font-weight: 800; }
 
-/* ==========================================
-   5. Main Application Screen
-========================================== */
-.app-container {
-  max-width: 1140px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-.btn-nav-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-sub);
-  padding: 8px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  transition: all 0.15s ease;
-}
-.btn-nav-back:hover { color: var(--text-main); border-color: var(--text-muted); }
+/* 탭 버튼 */
+.tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+.tab-btn { padding: 10px 18px; border: none; cursor: pointer; border-radius: 10px; font-weight: 700; background: #e2e8f0; color: var(--text-sub); transition: 0.2s; font-size: 0.9em; }
+.tab-btn.active { border: 2px solid var(--gold); background: var(--navy); color: white; transform: translateY(-2px); }
 
-.page-head { margin-bottom: 20px; }
-.page-head h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+/* 과목 그리드 및 카드 */
+.section-title { font-size: 1.05em; font-weight: 800; color: var(--navy); margin: 24px 0 12px; border-left: 4px solid var(--gold); padding-left: 10px; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.subject-card { border: 1px solid var(--border); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.85em; transition: 0.2s; position: relative; background: var(--surface); cursor: pointer; }
+.subject-card:hover:not(.disabled-card) { border-color: #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+.recomm-badge { position: absolute; top: 10px; right: 10px; font-size: 1.1em; cursor: help; }
+.highlight-preset { border: 2.5px solid var(--gold) !important; background-color: #fffdf5 !important; }
 
-/* Career Input Bar */
-.career-bar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
-  flex-wrap: wrap;
-}
-.career-bar label { font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap; }
-.career-input {
-  flex: 1;
-  min-width: 240px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-.career-input:focus { border-color: var(--accent); }
+.bg-soc { background-color: var(--color-soc); border-left: 5px solid #4caf50; } 
+.bg-sci { background-color: var(--color-sci); border-left: 5px solid #2196f3; }
+.bg-kor { background-color: var(--color-kor); } .bg-math { background-color: var(--color-math); }
+.bg-eng { background-color: var(--color-eng); } .bg-pe { background-color: var(--color-pe); } 
+.bg-art { background-color: var(--color-art); } .bg-etc { background-color: var(--color-etc); }
 
-/* Sticky Dashboard Panel */
-.status-panel {
-  position: sticky;
-  top: 16px;
-  z-index: 50;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  margin-bottom: 28px;
-  box-shadow: var(--shadow-md);
-}
-.status-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.credit-summary { display: flex; align-items: center; gap: 24px; }
-.credit-item { display: flex; flex-direction: column; }
-.credit-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
-.credit-value { font-size: 1.35rem; font-weight: 700; color: var(--text-main); }
-.credit-total .credit-value { color: var(--accent); }
+input:disabled + div { opacity: 0.35; text-decoration: line-through; }
+.disabled-card { opacity: 0.45; cursor: not-allowed !important; background: #f8fafc; }
 
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-}
-.metric-box {
-  background: var(--bg-color);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-}
-.metric-name { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 2px; }
-.metric-stat { font-size: 1rem; font-weight: 700; color: var(--text-main); }
-.metric-stat.warn { color: var(--danger); }
+/* 리포트 출력 및 제출 */
+.report-print-area { width: 100%; padding: 32px; background: #fff; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+.report-header { text-align: center; border-bottom: 3px double var(--navy); margin-bottom: 20px; padding-bottom: 16px; }
+.report-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.report-card { border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; background: #f8fafc; }
+.report-list { list-style: none; padding: 0; margin: 0; font-size: 0.8em; }
+.report-list li { border-bottom: 1px solid #e2e8f0; padding: 6px 0; display: flex; justify-content: space-between; }
+.badge-s { font-size: 0.75em; padding: 1px 6px; border-radius: 4px; font-weight: 700; }
+.b-fixed { background: #e2e8f0; color: #475569; }
+.b-sel { background: #dbeafe; color: #1e40af; }
 
-/* Tabs Navigation */
-.tabs-nav {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-  overflow-x: auto;
-}
-.tab-link {
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-sub);
-  background: transparent;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  position: relative;
-}
-.tab-link:hover { color: var(--text-main); background: var(--surface-hover); }
-.tab-link.active { color: var(--surface); background: var(--primary); }
-.tab-link.completed::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 6px;
-  height: 6px;
-  background-color: var(--success);
-  border-radius: 50%;
-}
+.action-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn-action { padding: 12px 24px; border: none; border-radius: 10px; color: white; font-weight: 700; cursor: pointer; font-size: 0.95em; transition: 0.2s; }
+.btn-submit-main { background: var(--navy); width: 100%; max-width: 360px; padding: 16px; font-size: 1.05em; margin-top: 10px; }
 
-/* Sections & Cards Grid */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 28px 0 14px;
-}
-.section-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-.section-badge { font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: var(--border); color: var(--text-sub); }
-
-.btn-reset-sem {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-sub);
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  transition: all 0.15s ease;
-}
-.btn-reset-sem:hover { color: var(--danger); border-color: var(--danger); }
-
-.subject-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-}
-.subject-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.subject-card:hover:not(.disabled) { border-color: var(--border-focus); box-shadow: var(--shadow-sm); }
-.subject-card.selected { border-color: var(--accent); background-color: var(--accent-light); }
-.subject-card.disabled { opacity: 0.45; cursor: not-allowed; background-color: #F8FAFC; }
-.subject-card.fixed { background-color: #F8FAFC; cursor: default; }
-
-.subject-checkbox {
-  margin-top: 3px;
-  accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
-}
-
-.subject-info { flex: 1; }
-.subject-tags { display: flex; gap: 6px; margin-bottom: 6px; }
-.tag { font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
-.tag-kor { background: #FEE2E2; color: #991B1B; }
-.tag-math { background: #FEF3C7; color: #92400E; }
-.tag-eng { background: #E0E7FF; color: #3730A3; }
-.tag-soc { background: #D1FAE5; color: #065F46; }
-.tag-sci { background: #E0F2FE; color: #075985; }
-.tag-art { background: #FCE7F3; color: #9D174D; }
-.tag-pe { background: #F3E8FF; color: #6B21A8; }
-.tag-etc { background: #F1F5F9; color: #475569; }
-
-.subject-name { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-.subject-meta { font-size: 0.8rem; color: var(--text-sub); }
-.subject-alert { font-size: 0.75rem; font-weight: 600; color: var(--danger); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-
-/* ==========================================
-   6. Final Summary View & Submission
-========================================== */
-.report-paper {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
-}
-.report-header { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px; }
-.report-header h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-.report-meta { font-size: 0.9rem; color: var(--text-sub); }
-
-.report-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.report-column {
-  background: var(--bg-color);
-  border-radius: var(--radius-md);
-  padding: 16px;
-}
-.report-column h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-.report-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.report-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; }
-.report-item .name { font-weight: 500; color: var(--text-main); }
-.report-item .meta { color: var(--text-muted); font-size: 0.75rem; }
-.report-item.custom .name { font-weight: 700; color: var(--accent); }
-
-.submit-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; text-align: center; }
-.btn-submit {
-  background: var(--accent);
-  color: var(--surface);
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 14px 28px;
-  border-radius: var(--radius-md);
-  width: 100%;
-  max-width: 320px;
-  transition: background-color 0.15s ease;
-}
-.btn-submit:hover { background: #1D4ED8; }
-.btn-submit:disabled { background: var(--text-muted); cursor: not-allowed; }
-.submit-message { margin-top: 14px; font-size: 0.875rem; font-weight: 600; }
-
-/* ==========================================
-   7. Modal Window
-========================================== */
-.modal-backdrop {
-  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
-  z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-backdrop.open { display: flex; }
-.modal-window {
-  background: var(--surface); border-radius: var(--radius-lg); max-width: 840px; width: 100%;
-  max-height: 85vh; overflow-y: auto; padding: 32px; box-shadow: var(--shadow-xl);
-}
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-.modal-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
-.btn-close-modal { font-size: 1.25rem; color: var(--text-muted); padding: 4px; }
-
-/* ==========================================
-   8. Spinner & Responsive
-========================================== */
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; }
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2.5px solid #cbd5e1; border-top-color: var(--navy); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
-  .menu-grid, .report-grid { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: repeat(3, 1fr); }
-  .status-top { flex-direction: column; align-items: flex-start; }
+  .sub-stats, .report-grid { grid-template-columns: repeat(2, 1fr); }
+  .menu-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  .master-dashboard, .tabs, .action-group, .top-nav, .career-input-area { display: none !important; }
+  .app-container { margin: 0; padding: 0; max-width: 100%; }
+  #sc-select { display: block !important; }
+  #view-final { display: block !important; }
+  #content-area > div:not(#view-final) { display: none !important; }
 }
 </style>
 </head>
@@ -437,49 +123,37 @@ input { font-family: inherit; }
 
 <div id="sc-login" class="screen active">
   <div class="login-card">
-    <div class="login-inst">Nonsan Daegon High School</div>
-    <h1 class="login-title">수강신청 포털 로그인</h1>
-    <p class="login-desc">2026학년도 입학생 교육과정 선택 시스템</p>
-    
-    <div id="g-btn-wrap" style="min-height:44px; display:flex; justify-content:center; align-items:center;">
+    <div style="font-size:0.8em; font-weight:800; color:var(--navy); letter-spacing:1px;">NONSAN DAEGUN HIGH SCHOOL</div>
+    <h1 style="font-size:1.6em; font-weight:800; margin:10px 0;">교육과정 수강신청 포털</h1>
+    <p style="color:var(--text-sub); font-size:0.9em; margin-bottom:30px;">2026학년도 입학생 교육과정 시뮬레이터</p>
+    <div id="g-btn-wrap" style="min-height:44px; display:flex; justify-content:center;">
       <span class="spinner"></span>
     </div>
-    
-    <div class="login-divider"></div>
-    <p class="login-notice">반드시 학교 부여 구글 계정(<b>@pess.cnehs.kr</b>)을 사용해 접속해주시기 바랍니다.</p>
-    <div id="login-status" class="login-status"></div>
+    <p style="font-size:0.8em; color:#94a3b8; margin-top:24px;">학교 부여 구글 계정(<b>@pess.cnehs.kr</b>) 전용</p>
+    <div id="login-status" style="margin-top:14px; font-size:0.85em; font-weight:600;"></div>
   </div>
 </div>
 
 <div id="sc-year" class="screen">
   <div class="portal-container">
-    <div class="portal-header">
-      <h2>교육과정 과목 선택 포털</h2>
-      <p>원하시는 서비스 메뉴를 선택해주시기 바랍니다.</p>
+    <div style="text-align:center;">
+      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">교육과정 설계 마스터</h2>
+      <p style="color:var(--text-sub);">본인의 학적을 확인하고 희망하는 메뉴를 선택하세요.</p>
     </div>
-    
-    <div class="user-badge-bar">
-      <div class="user-info">
-        <span class="user-dot"></span>
-        <span id="user-display">로그인 정보 확인 중...</span>
-      </div>
-      <button class="btn-reset-sem" onclick="location.reload()">로그아웃</button>
+    <div style="background:var(--surface); padding:14px 20px; border-radius:12px; border:1px solid var(--border); margin-top:24px; display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-weight:700;" id="user-display">사용자 인증 중...</div>
+      <button onclick="location.reload()" class="btn-back" style="font-size:0.8em;">로그아웃</button>
     </div>
-    
     <div class="menu-grid">
       <div class="menu-card" onclick="chooseMenu(1)">
-        <div>
-          <span class="menu-tag">신청접수 중</span>
-          <h3>2026 입학생 과목 선택</h3>
-          <p>현 1학년 학생 대상. 학기별 예술, 교양 및 심화 선택과목 수강신청을 진행합니다.</p>
-        </div>
+        <span style="background:#e0f2fe; color:#0369a1; font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px;">신청접수 중</span>
+        <h3 style="font-size:1.25em; font-weight:800; margin:12px 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
+        <p style="font-size:0.85em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 설계서를 제출합니다.</p>
       </div>
       <div class="menu-card" onclick="chooseMenu(2)">
-        <div>
-          <span class="menu-tag" style="background:#F1F5F9; color:#475569">조회 전용</span>
-          <h3>1학년 과목 선택 내역 조회</h3>
-          <p>이전에 제출이 완료된 본인의 학기별 교육과정 이수 설계 내역을 확인합니다.</p>
-        </div>
+        <span style="background:#f1f5f9; color:#475569; font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px;">조회 전용</span>
+        <h3 style="font-size:1.25em; font-weight:800; margin:12px 0 8px;">제출 내역 조회 및 출력</h3>
+        <p style="font-size:0.85em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장합니다.</p>
       </div>
     </div>
   </div>
@@ -488,86 +162,68 @@ input { font-family: inherit; }
 <div id="sc-select" class="screen">
   <div class="app-container">
     <div class="top-nav">
-      <button class="btn-nav-back" onclick="showScreen('sc-year')">← 메뉴로 돌아가기</button>
-      <div id="nav-student-info" style="font-size:0.875rem; font-weight:600; color:var(--text-sub);"></div>
-    </div>
-    
-    <div class="page-head">
-      <h1>2026학년도 교육과정 이수 설계</h1>
-    </div>
-    
-    <div class="career-bar">
-      <label for="career-input">희망 진로(전공) 입력</label>
-      <input type="text" id="career-input" class="career-input" placeholder="예) 인공지능 엔지니어, 컴퓨터공학, 경영데이터 분석 등" oninput="updateUI()">
-      <button id="btn-prev-modal" class="btn-reset-sem" style="display:none;" onclick="openPrevModal()">기존 제출 내역 확인</button>
+      <button class="btn-back" onclick="showScreen('sc-year')">← 메뉴 목록으로</button>
+      <div id="nav-student-info" style="font-weight:700; font-size:0.9em; color:var(--navy);"></div>
     </div>
 
-    <div class="status-panel">
-      <div class="status-top">
-        <div class="credit-summary">
-          <div class="credit-item">
-            <span class="credit-label">지정 학점</span>
-            <span class="credit-value" id="val-fixed">0</span>
-          </div>
-          <span style="font-size:1.2rem; color:var(--text-muted)">+</span>
-          <div class="credit-item">
-            <span class="credit-label">선택 학점</span>
-            <span class="credit-value" id="val-select">0</span>
-          </div>
-          <span style="font-size:1.2rem; color:var(--text-muted)">=</span>
-          <div class="credit-item credit-total">
-            <span class="credit-label">이수 총계 (목표 174)</span>
-            <span class="credit-value" id="val-total">0</span>
-          </div>
-        </div>
-        <div id="status-message" style="font-size:0.85rem; font-weight:600; color:var(--text-sub);"></div>
+    <div class="career-input-area">
+      <div class="career-row">
+        <span style="font-weight:800; color:var(--navy); min-width:75px;">나의 꿈:</span>
+        <input type="text" id="career-name" placeholder="희망하는 진로를 입력하세요 (예: AI 소프트웨어 개발자, 생명공학자)" oninput="updateUI()">
       </div>
-      
-      <div class="metrics-grid">
-        <div class="metric-box">
-          <span class="metric-name">국·영·수 (81 이하)</span>
-          <span class="metric-stat" id="stat-kms">0</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-name">사회탐구 영역</span>
-          <span class="metric-stat" id="stat-soc">0</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-name">과학탐구 영역</span>
-          <span class="metric-stat" id="stat-sci">0</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-name">예술 영역</span>
-          <span class="metric-stat" id="stat-art">0</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-name">체육 영역</span>
-          <span class="metric-stat" id="stat-pe">0</span>
-        </div>
-        <div class="metric-box">
-          <span class="metric-name">교양 영역 (16 이상)</span>
-          <span class="metric-stat" id="stat-lib">0</span>
-        </div>
+      <div class="preset-group">
+        <span style="font-size:0.85em; font-weight:700; color:#64748b; margin-right:4px;">진로 계열 추천:</span>
+        <button class="preset-btn" onclick="applyPreset('medical')">의학·생명</button>
+        <button class="preset-btn" onclick="applyPreset('engineering')">이공·계열</button>
+        <button class="preset-btn" onclick="applyPreset('humanities')">인문·사회</button>
+        <button class="preset-btn" onclick="applyPreset('edu')">사범·교육</button>
+        <button class="preset-btn" style="border-color:#cbd5e1;" onclick="clearPreset()">하이라이트 초기화</button>
       </div>
     </div>
 
-    <div class="tabs-nav" id="tabs-bar"></div>
-    <div id="content-views"></div>
+    <div class="master-dashboard">
+      <div class="main-calc">
+        <div style="text-align:center;"><span class="score-label">지정 학점</span><span id="fixed-cr" class="num">0</span></div>
+        <div style="text-align:center;"><span class="score-label">선택 학점</span><span id="select-cr" class="num">0</span></div>
+        <div style="font-size:1.5em; font-weight:800;">=</div>
+        <div style="text-align:center;" class="total"><span class="score-label" style="color:var(--gold)">최종 누적 학점 (목표 174)</span><span id="total-cr" class="num">0</span></div>
+      </div>
+      <div class="sub-stats">
+        <div class="stat-card"><span class="label">국영수(81↓)</span><span id="kms-val" class="val">0</span></div>
+        <div class="stat-card"><span class="label">사회탐구</span><span id="stat-soc" class="val">0</span></div>
+        <div class="stat-card"><span class="label">과학탐구</span><span id="stat-sci" class="val">0</span></div>
+        <div class="stat-card"><span class="label">예술</span><span id="stat-art" class="val">0</span></div>
+        <div class="stat-card"><span class="label">체육</span><span id="stat-pe" class="val">0</span></div>
+        <div class="stat-card"><span class="label">교양(16↑)</span><span id="stat-lib" class="val">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tab-bar"></div>
+    <div id="content-area"></div>
 
     <div id="view-final" class="screen">
-      <div class="report-paper">
+      <div class="report-print-area" id="capture-area">
         <div class="report-header">
-          <h2>2026학년도 입학생 교육과정 이수 설계서</h2>
-          <div class="report-meta">
-            학번·성명: <strong id="rep-student"></strong> | 희망 진로: <strong id="rep-career" style="color:var(--accent)"></strong>
+          <h2 style="font-size:1.5em; font-weight:800; color:var(--navy);">2026학년도 입학생 교육과정 이수 설계서</h2>
+          <div style="font-size:1.05em; margin:10px 0; font-weight:800;">
+            학번·성명: <span id="r-student" style="color:var(--navy)"></span> | 희망 진로: <span id="r-career" style="color:var(--gold); border-bottom:2px solid var(--gold);">미입력</span>
+          </div>
+          <div style="font-size:0.85em; color:#64748b;">
+            총 이수: <strong id="r-total">0</strong>학점 | 국영수 기초: <strong id="r-kms">0</strong>학점 | 교양 영역: <strong id="r-lib">0</strong>학점
           </div>
         </div>
-        <div class="report-grid" id="report-container"></div>
+        <div id="report-grid" class="report-grid"></div>
       </div>
-      
-      <div class="submit-box">
-        <button class="btn-submit" id="btn-submit" onclick="submitApplication()">이수 설계서 최종 제출하기</button>
-        <div id="submit-feedback" class="submit-message"></div>
+
+      <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--border); text-align:center;">
+        <div class="action-group" style="margin-bottom:16px;">
+          <button class="btn-action" style="background:#166534;" onclick="exportToExcel()">📊 엑셀 저장</button>
+          <button class="btn-action" style="background:#1e40af;" onclick="saveAsImage()">🖼️ 이미지 저장</button>
+          <button class="btn-action" style="background:#475569;" onclick="window.print()">📄 A4 출력 / PDF 인쇄</button>
+        </div>
+        <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
+        <button class="btn-action btn-submit-main" id="btn-submit-server" onclick="submitToServer()">최종 이수 설계서 서버로 제출하기</button>
+        <div id="submit-feedback" style="margin-top:12px; font-size:0.9em; font-weight:700;"></div>
       </div>
     </div>
   </div>
@@ -576,109 +232,66 @@ input { font-family: inherit; }
 <div id="sc-check" class="screen">
   <div class="app-container">
     <div class="top-nav">
-      <button class="btn-nav-back" onclick="showScreen('sc-year')">← 메뉴로 돌아가기</button>
-      <div id="check-user-display" style="font-size:0.875rem; font-weight:600; color:var(--text-sub);"></div>
+      <button class="btn-back" onclick="showScreen('sc-year')">← 메뉴 목록으로</button>
+      <div id="check-user-display" style="font-weight:700; color:var(--navy);"></div>
     </div>
-    
-    <div class="page-head" style="text-align:center; margin-bottom:32px;">
-      <h1>선택과목 제출 내역 조회</h1>
-    </div>
-    
     <div id="check-content"></div>
-  </div>
-</div>
-
-<div id="modal-prev" class="modal-backdrop">
-  <div class="modal-window">
-    <div class="modal-header">
-      <div>
-        <h3>기존 선택 내역 확인</h3>
-        <span style="font-size:0.8rem; color:var(--text-muted);" id="modal-time-str"></span>
-      </div>
-      <button class="btn-close-modal" onclick="closePrevModal()">✕</button>
-    </div>
-    <div class="report-grid" id="modal-grid-container"></div>
   </div>
 </div>
 
 <script>
 // ==========================================
-// 시스템 구성 변수 (GAS 웹앱 URL 필수)
+// [설정] 구글 앱스크립트 배포 URL 입력 필수
 // ==========================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwSzwoZGXdcefEn-vgT6zhTIBgACdVO3UymEwhr2u57QmmomWvoHiPgDXm6MeIeqg/exec';
 const CLIENT_ID = '132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleusercontent.com';
 
 let idToken = null;
 let studentInfo = null;
-let savedSelections = null;
-let savedTimestamp = '';
 
-const SEMESTERS = ['t1_1', 't1_2', 't2_1', 't2_2', 't3_1', 't3_2'];
-const SEM_LABELS = { t1_1:'1학년 1학기', t1_2:'1학년 2학기', t2_1:'2학년 1학기', t2_2:'2학년 2학기', t3_1:'3학년 1학기', t3_2:'3학년 2학기' };
-
-const PREREQUISITES = {
-  '역학과 에너지': '물리학', '전자기와 양자': '물리학',
-  '물질과 에너지': '화학', '화학 반응의 세계': '화학',
-  '세포와 물질대사': '생명과학', '생물의 유전': '생명과학',
-  '지구시스템과학': '지구과학', '행성우주과학': '지구과학'
+// [2026 고유 데이터] 위계성 규칙 및 진로 가이드
+const semesterOrder = ["t1_1", "t1_2", "t2_1", "t2_2", "t3_1", "t3_2"];
+const hierarchyMap = { "역학과 에너지": "물리학", "전자기와 양자": "물리학", "물질과 에너지": "화학", "화학 반응의 세계": "화학", "세포와 물질대사": "생명과학", "생물의 유전": "생명과학", "지구시스템과학": "지구과학", "행성우주과학": "지구과학" };
+const coreGuide = {
+  "물리학": "공학·물리·IT 계열 진학 시 필수 핵심 권장 과목입니다.",
+  "미적분Ⅰ": "이공·상경 계열 진학 시 대학 수학의 기초가 되는 핵심 과목입니다.",
+  "기하": "서울대·고려대 등 주요 공과대학에서 강조하는 핵심 권장 과목입니다.",
+  "생명과학": "의학·간호·생명공학 진학 시 전공적합성을 보여주는 핵심 과목입니다.",
+  "화학": "공학·의학·약학 등 자연과학 기반 전공의 필수 이수 과목입니다.",
+  "경제": "경영·경제 및 사회과학계열 진학 시 학업 역량을 증명하는 중요 과목입니다.",
+  "정치": "법학·행정·정치외교 계열 희망 학생에게 강력 권장되는 과목입니다.",
+  "수학과제 탐구": "자연/공학 계열 진학 시 심화 탐구 능력을 보여주기 좋은 융합 과목입니다."
 };
 
-const FIXED_SUBJECTS = {
-  t1_1: [{n:'공통국어1',g:'kor',c:4,t:'공통'},{n:'공통수학1',g:'math',c:4,t:'공통'},{n:'공통영어1',g:'eng',c:4,t:'공통'},{n:'한국사1',g:'soc',c:3,t:'공통'},{n:'통합사회1',g:'soc',c:4,t:'공통'},{n:'통합과학1',g:'sci',c:4,t:'공통'},{n:'과학탐구실험1',g:'sci',c:1,t:'공통'},{n:'정보',g:'etc',c:3,t:'일반'},{n:'스포츠문화',g:'pe',c:1,t:'진로'}],
-  t1_2: [{n:'공통국어2',g:'kor',c:4,t:'공통'},{n:'공통수학2',g:'math',c:4,t:'공통'},{n:'공통영어2',g:'eng',c:4,t:'공통'},{n:'한국사2',g:'soc',c:3,t:'공통'},{n:'통합사회2',g:'soc',c:4,t:'공통'},{n:'통합과학2',g:'sci',c:4,t:'공통'},{n:'과학탐구실험2',g:'sci',c:1,t:'공통'},{n:'인공지능기초',g:'etc',c:3,t:'진로'},{n:'스포츠과학',g:'pe',c:1,t:'진로'}],
-  t2_1: [{n:'독서와 작문',g:'kor',c:4,t:'일반'},{n:'대수',g:'math',c:4,t:'일반'},{n:'영어Ⅰ',g:'eng',c:4,t:'일반'},{n:'체육1',g:'pe',c:2,t:'일반'}],
-  t2_2: [{n:'문학',g:'kor',c:4,t:'일반'},{n:'미적분Ⅰ',g:'math',c:4,t:'일반'},{n:'영어Ⅱ',g:'eng',c:4,t:'일반'},{n:'체육2',g:'pe',c:2,t:'일반'}],
-  t3_1: [{n:'화법과 언어',g:'kor',c:4,t:'일반'},{n:'확률과 통계',g:'math',c:4,t:'일반'},{n:'영어 독해와 작문',g:'eng',c:4,t:'일반'},{n:'운동과 건강',g:'pe',c:2,t:'진로'}],
-  t3_2: [{n:'스포츠 생활1',g:'pe',c:2,t:'융합'},{n:'생애 설계와 자립',g:'etc',c:1,t:'융합'}]
+const fixedSubjects = {
+  t1_1: [{n:"공통국어1", g:"kor", c:4, t:"공통"}, {n:"공통수학1", g:"math", c:4, t:"공통"}, {n:"공통영어1", g:"eng", c:4, t:"공통"}, {n:"한국사1", g:"soc", c:3, t:"공통"}, {n:"통합사회1", g:"soc", c:4, t:"공통"}, {n:"통합과학1", g:"sci", c:4, t:"공통"}, {n:"과학탐구실험1", g:"sci", c:1, t:"공통"}, {n:"정보", g:"etc", c:3, t:"일반"}, {n:"스포츠문화", g:"pe", c:1, t:"진로"}],
+  t1_2: [{n:"공통국어2", g:"kor", c:4, t:"공통"}, {n:"공통수학2", g:"math", c:4, t:"공통"}, {n:"공통영어2", g:"eng", c:4, t:"공통"}, {n:"한국사2", g:"soc", c:3, t:"공통"}, {n:"통합사회2", g:"soc", c:4, t:"공통"}, {n:"통합과학2", g:"sci", c:4, t:"공통"}, {n:"과학탐구실험2", g:"sci", c:1, t:"공통"}, {n:"인공지능기초", g:"etc", c:3, t:"진로"}, {n:"스포츠과학", g:"pe", c:1, t:"진로"}],
+  t2_1: [{n:"독서와 작문", g:"kor", c:4, t:"일반"}, {n:"대수", g:"math", c:4, t:"일반"}, {n:"영어Ⅰ", g:"eng", c:4, t:"일반"}, {n:"체육1", g:"pe", c:2, t:"일반"}],
+  t2_2: [{n:"문학", g:"kor", c:4, t:"일반"}, {n:"미적분Ⅰ", g:"math", c:4, t:"일반"}, {n:"영어Ⅱ", g:"eng", c:4, t:"일반"}, {n:"체육2", g:"pe", c:2, t:"일반"}],
+  t3_1: [{n:"화법과 언어", g:"kor", c:4, t:"일반"}, {n:"확률과 통계", g:"math", c:4, t:"일반"}, {n:"영어 독해와 작문", g:"eng", c:4, t:"일반"}, {n:"운동과 건강", g:"pe", c:2, t:"진로"}],
+  t3_2: [{n:"스포츠 생활1", g:"pe", c:2, t:"융합"}, {n:"생애 설계와 자립", g:"etc", c:1, t:"융합"}]
 };
 
-const CHOICE_GROUPS = {
-  t1_1: [{id:'s1_1',name:'예술 및 교양 영역 선택 (택 1)',limit:1,list:[{n:'음악',g:'art',c:2,t:'일반'},{n:'미술',g:'art',c:2,t:'일반'},{n:'삶과 종교',g:'etc',c:2,t:'진로'}]}],
-  t1_2: [{id:'s1_2',name:'예술 및 교양 영역 선택 (택 1)',limit:1,list:[{n:'음악',g:'art',c:2,t:'일반'},{n:'미술',g:'art',c:2,t:'일반'},{n:'삶과 종교',g:'etc',c:2,t:'진로'}]}],
-  t2_1: [
-    {id:'s2_art1',name:'예술 영역 선택 (택 1)',limit:1,list:[{n:'음악 연주와 창작',g:'art',c:2,t:'진로'},{n:'미술 창작',g:'art',c:2,t:'진로'}]},
-    {id:'s2_lib1',name:'교양 영역 선택 (택 1)',limit:1,list:[{n:'교육의 이해',g:'etc',c:2,t:'진로'},{n:'인간과 철학',g:'etc',c:2,t:'진로'},{n:'논술',g:'etc',c:2,t:'융합'},{n:'인간과 심리',g:'etc',c:2,t:'진로'},{n:'보건',g:'etc',c:2,t:'진로'}]},
-    {id:'s4',name:'심화 탐구 과목 선택 (택 4)',limit:4,list:[{n:'주제 탐구 독서',g:'kor',c:3,t:'진로'},{n:'인공지능 수학',g:'math',c:3,t:'진로'},{n:'영어 발표와 토론',g:'eng',c:3,t:'진로'},{n:'세계시민과 지리',g:'soc',c:3,t:'일반'},{n:'세계사',g:'soc',c:3,t:'일반'},{n:'사회와 문화',g:'soc',c:3,t:'일반'},{n:'정치',g:'soc',c:3,t:'진로'},{n:'현대사회와 윤리',g:'soc',c:3,t:'일반'},{n:'물리학',g:'sci',c:3,t:'일반'},{n:'화학',g:'sci',c:3,t:'일반'},{n:'생명과학',g:'sci',c:3,t:'일반'},{n:'지구과학',g:'sci',c:3,t:'일반'},{n:'프로그래밍',g:'etc',c:3,t:'진로'},{n:'일본어',g:'etc',c:3,t:'일반'},{n:'중국어',g:'etc',c:3,t:'일반'}]}
-  ],
-  t2_2: [
-    {id:'s2_art2',name:'예술 영역 선택 (택 1)',limit:1,list:[{n:'음악 연주와 창작',g:'art',c:2,t:'진로'},{n:'미술 창작',g:'art',c:2,t:'진로'}]},
-    {id:'s2_lib2',name:'교양 영역 선택 (택 1)',limit:1,list:[{n:'교육의 이해',g:'etc',c:2,t:'진로'},{n:'인간과 철학',g:'etc',c:2,t:'진로'},{n:'논술',g:'etc',c:2,t:'융합'},{n:'인간과 심리',g:'etc',c:2,t:'진로'},{n:'보건',g:'etc',c:2,t:'진로'}]},
-    {id:'s5',name:'심화 탐구 과목 선택 (택 4)',limit:4,list:[{n:'매체 의사소통',g:'kor',c:3,t:'융합'},{n:'독서 토론과 글쓰기',g:'kor',c:3,t:'융합'},{n:'기하',g:'math',c:3,t:'진로'},{n:'수학과 문화',g:'math',c:3,t:'융합'},{n:'심화 영어',g:'eng',c:3,t:'진로'},{n:'한국지리 탐구',g:'soc',c:3,t:'진로'},{n:'동아시아 역사 기행',g:'soc',c:3,t:'진로'},{n:'사회와 문화',g:'soc',c:3,t:'일반'},{n:'법과 사회',g:'soc',c:3,t:'진로'},{n:'윤리와 사상',g:'soc',c:3,t:'진로'},{n:'물리학',g:'sci',c:3,t:'일반'},{n:'화학',g:'sci',c:3,t:'일반'},{n:'생명과학',g:'sci',c:3,t:'일반'},{n:'지구과학',g:'sci',c:3,t:'일반'},{n:'역학과 에너지',g:'sci',c:3,t:'진로'},{n:'물질과 에너지',g:'sci',c:3,t:'진로'},{n:'세포와 물질대사',g:'sci',c:3,t:'진로'},{n:'지구시스템과학',g:'sci',c:3,t:'진로'},{n:'정보과학',g:'etc',c:3,t:'진로'},{n:'소프트웨어와 생활',g:'etc',c:3,t:'융합'},{n:'일본어 회화',g:'etc',c:3,t:'진로'},{n:'중국어 회화',g:'etc',c:3,t:'진로'}]}
-  ],
-  t3_1: [
-    {id:'s3_art1',name:'예술 영역 선택 (택 1)',limit:1,list:[{n:'음악 감상과 비평',g:'art',c:2,t:'진로'},{n:'미술 감상과 비평',g:'art',c:2,t:'진로'}]},
-    {id:'s6',name:'심화 탐구 과목 선택 (택 4)',limit:4,list:[{n:'독서 토론과 글쓰기',g:'kor',c:3,t:'융합'},{n:'미적분 II',g:'math',c:3,t:'진로'},{n:'심화 영어 독해와 작문',g:'eng',c:3,t:'진로'},{n:'도시의 미래 탐구',g:'soc',c:3,t:'진로'},{n:'역사로 탐구하는 현대세계',g:'soc',c:3,t:'융합'},{n:'경제',g:'soc',c:3,t:'일반'},{n:'인문학과 윤리',g:'soc',c:3,t:'진로'},{n:'역학과 에너지',g:'sci',c:3,t:'진로'},{n:'물질과 에너지',g:'sci',c:3,t:'진로'},{n:'세포와 물질대사',g:'sci',c:3,t:'진로'},{n:'지구시스템과학',g:'sci',c:3,t:'진로'},{n:'전자기와 양자',g:'sci',c:3,t:'진로'},{n:'화학 반응의 세계',g:'sci',c:3,t:'진로'},{n:'생물의 유전',g:'sci',c:3,t:'진로'},{n:'행성우주과학',g:'sci',c:3,t:'진로'},{n:'일본 문화',g:'etc',c:3,t:'융합'},{n:'중국 문화',g:'etc',c:3,t:'융합'},{n:'데이터 과학',g:'etc',c:3,t:'진로'}]}
-  ],
-  t3_2: [
-    {id:'s3_art2',name:'예술 영역 선택 (택 1)',limit:1,list:[{n:'음악 감상과 비평',g:'art',c:2,t:'진로'},{n:'미술 감상과 비평',g:'art',c:2,t:'진로'}]},
-    {id:'s7',name:'융합 탐구 과목 선택 (택 3)',limit:3,list:[{n:'문학과 영상',g:'kor',c:4,t:'융합'},{n:'언어생활 탐구',g:'kor',c:4,t:'융합'},{n:'수학과제 탐구',g:'math',c:4,t:'융합'},{n:'세계 문화와 영어',g:'eng',c:4,t:'융합'},{n:'미디어 영어',g:'eng',c:4,t:'융합'}]},
-    {id:'s8',name:'융합 탐구 과목 선택 (택 3)',limit:3,list:[{n:'사회문제 탐구',g:'soc',c:3,t:'융합'},{n:'윤리문제 탐구',g:'soc',c:3,t:'융합'},{n:'역사로 탐구하는 현대세계',g:'soc',c:3,t:'융합'},{n:'융합과학 탐구',g:'sci',c:3,t:'융합'},{n:'기후변화와 환경생태',g:'sci',c:3,t:'융합'},{n:'인공지능 일반',g:'etc',c:3,t:'진로'},{n:'심화 일본어',g:'etc',c:3,t:'진로'},{n:'심화 중국어',g:'etc',c:3,t:'진로'}]}
-  ]
+const curriculum = {
+  t1_1: { target: 1, choices: [{ id: 's1_1', name: '예술 및 교양 (택1)', limit: 1, list: [{n:"음악", g:"art", c:2, t:"일반"}, {n:"미술", g:"art", c:2, t:"일반"}, {n:"삶과 종교", g:"etc", c:2, t:"진로"}]}]},
+  t1_2: { target: 1, choices: [{ id: 's1_2', name: '예술 및 교양 (택1)', limit: 1, list: [{n:"음악", g:"art", c:2, t:"일반"}, {n:"미술", g:"art", c:2, t:"일반"}, {n:"삶과 종교", g:"etc", c:2, t:"진로"}]}]},
+  t2_1: { target: 6, choices: [{ id: 's2_art1', name: '예술 영역 (택1)', limit: 1, list: [{n:"음악 연주와 창작", g:"art", c:2, t:"진로"}, {n:"미술 창작", g:"art", c:2, t:"진로"}]}, { id: 's2_lib1', name: '교양 영역 (택1)', limit: 1, list: [{n:"교육의 이해", g:"etc", c:2, t:"진로"}, {n:"인간과 철학", g:"etc", c:2, t:"진로"}, {n:"논술", g:"etc", c:2, t:"융합"}, {n:"인간과 심리", g:"etc", c:2, t:"진로"}, {n:"보건", g:"etc", c:2, t:"진로"}]}, { id: 's4', name: '심화 선택그룹 (택4)', limit: 4, list: [{n:"주제 탐구 독서", g:"kor", c:3, t:"진로", kms:true}, {n:"인공지능 수학", g:"math", c:3, t:"진로", kms:true}, {n:"영어 발표와 토론", g:"eng", c:3, t:"진로", kms:true}, {n:"세계시민과 지리", g:"soc", c:3, t:"일반"}, {n:"세계사", g:"soc", c:3, t:"일반"}, {n:"사회와 문화", g:"soc", c:3, t:"일반"}, {n:"정치", g:"soc", c:3, t:"진로"}, {n:"현대사회와 윤리", g:"soc", c:3, t:"일반"}, {n:"물리학", g:"sci", c:3, t:"일반"}, {n:"화학", g:"sci", c:3, t:"일반"}, {n:"생명과학", g:"sci", c:3, t:"일반"}, {n:"지구과학", g:"sci", c:3, t:"일반"}, {n:"프로그래밍", g:"etc", c:3, t:"진로"}, {n:"일본어", g:"etc", c:3, t:"일반"}, {n:"중국어", g:"etc", c:3, t:"일반"}] }]},
+  t2_2: { target: 6, choices: [{ id: 's2_art2', name: '예술 영역 (택1)', limit: 1, list: [{n:"음악 연주와 창작", g:"art", c:2, t:"진로"}, {n:"미술 창작", g:"art", c:2, t:"진로"}]}, { id: 's2_lib2', name: '교양 영역 (택1)', limit: 1, list: [{n:"교육의 이해", g:"etc", c:2, t:"진로"}, {n:"인간과 철학", g:"etc", c:2, t:"진로"}, {n:"논술", g:"etc", c:2, t:"융합"}, {n:"인간과 심리", g:"etc", c:2, t:"진로"}, {n:"보건", g:"etc", c:2, t:"진로"}]}, { id: 's5', name: '심화 선택그룹 (택4)', limit: 4, list: [{n:"매체 의사소통", g:"kor", c:3, t:"융합"}, {n:"독서 토론과 글쓰기", g:"kor", c:3, t:"융합", kms:true}, {n:"기하", g:"math", c:3, t:"진로", kms:true}, {n:"수학과 문화", g:"math", c:3, t:"융합", kms:true}, {n:"심화 영어", g:"eng", c:3, t:"진로", kms:true}, {n:"한국지리 탐구", g:"soc", c:3, t:"진로"}, {n:"동아시아 역사 기행", g:"soc", c:3, t:"진로"}, {n:"사회와 문화", g:"soc", c:3, t:"일반"}, {n:"법과 사회", g:"soc", c:3, t:"진로"}, {n:"윤리와 사상", g:"soc", c:3, t:"진로"}, {n:"물리학", g:"sci", c:3, t:"일반"}, {n:"화학", g:"sci", c:3, t:"일반"}, {n:"생명과학", g:"sci", c:3, t:"일반"}, {n:"지구과학", g:"sci", c:3, t:"일반"}, {n:"역학과 에너지", g:"sci", c:3, t:"진로"}, {n:"물질과 에너지", g:"sci", c:3, t:"진로"}, {n:"세포와 물질대사", g:"sci", c:3, t:"진로"}, {n:"지구시스템과학", g:"sci", c:3, t:"진로"}, {n:"정보과학", g:"etc", c:3, t:"진로"}, {n:"소프트웨어와 생활", g:"etc", c:3, t:"융합"}, {n:"일본어 회화", g:"etc", c:3, t:"진로"}, {n:"중국어 회화", g:"etc", c:3, t:"진로"}] }]},
+  t3_1: { target: 5, choices: [{ id: 's3_art1', name: '예술 영역 (택1)', limit: 1, list: [{n:"음악 감상과 비평", g:"art", c:2, t:"진로"}, {n:"미술 감상과 비평", g:"art", c:2, t:"진로"}]}, { id: 's6', name: '심화 선택그룹 (택4)', limit: 4, list: [{n:"독서 토론과 글쓰기", g:"kor", c:3, t:"융합", kms:true}, {n:"미적분 II", g:"math", c:3, t:"진로", kms:true}, {n:"심화 영어 독해와 작문", g:"eng", c:3, t:"진로", kms:true}, {n:"도시의 미래 탐구", g:"soc", c:3, t:"진로"}, {n:"역사로 탐구하는 현대세계", g:"soc", c:3, t:"융합"}, {n:"경제", g:"soc", c:3, t:"일반"}, {n:"인문학과 윤리", g:"soc", c:3, t:"진로"}, {n:"역학과 에너지", g:"sci", c:3, t:"진로"}, {n:"물질과 에너지", g:"sci", c:3, t:"진로"}, {n:"세포와 물질대사", g:"sci", c:3, t:"진로"}, {n:"지구시스템과학", g:"sci", c:3, t:"진로"}, {n:"전자기와 양자", g:"sci", c:3, t:"진로"}, {n:"화학 반응의 세계", g:"sci", c:3, t:"진로"}, {n:"생물의 유전", g:"sci", c:3, t:"진로"}, {n:"행성우주과학", g:"sci", c:3, t:"진로"}, {n:"일본 문화", g:"etc", c:3, t:"융합"}, {n:"중국 문화", g:"etc", c:3, t:"융합"}, {n:"데이터 과학", g:"etc", c:3, t:"진로"}] }]},
+  t3_2: { target: 7, choices: [{ id: 's3_art2', name: '예술 영역 (택1)', limit: 1, list: [{n:"음악 감상과 비평", g:"art", c:2, t:"진로"}, {n:"미술 감상과 비평", g:"art", c:2, t:"진로"}]}, { id: 's7', name: '융합 선택그룹 (택3)', limit: 3, list: [{n:"문학과 영상", g:"kor", c:4, t:"융합"}, {n:"언어생활 탐구", g:"kor", c:4, t:"융합"}, {n:"수학과제 탐구", g:"math", c:4, t:"융합", kms:true}, {n:"세계 문화와 영어", g:"eng", c:4, t:"융합"}, {n:"미디어 영어", g:"eng", c:4, t:"융합", kms:true}]}, { id: 's8', name: '융합 선택그룹 (택3)', limit: 3, list: [{n:"사회문제 탐구", g:"soc", c:3, t:"융합"}, {n:"윤리문제 탐구", g:"soc", c:3, t:"융합"}, {n:"역사로 탐구하는 현대세계", g:"soc", c:3, t:"융합"}, {n:"융합과학 탐구", g:"sci", c:3, t:"융합"}, {n:"기후변화와 환경생태", g:"sci", c:3, t:"융합"}, {n:"인공지능 일반", g:"etc", c:3, t:"진로"}, {n:"심화 일본어", g:"etc", c:3, t:"진로"}, {n:"심화 중국어", g:"etc", c:3, t:"진로"}] }]}
 };
 
 const ALL_GROUP_IDS = ['s1_1','s1_2','s2_art1','s2_lib1','s4','s2_art2','s2_lib2','s5','s3_art1','s6','s3_art2','s7','s8'];
-const GROUP_LIMITS = {s1_1:1,s1_2:1,s2_art1:1,s2_lib1:1,s4:4,s2_art2:1,s2_lib2:1,s5:4,s3_art1:1,s6:4,s3_art2:1,s7:3,s8:3};
-const SEM_GROUP_MAP = {
-  t1_1:['s1_1'], t1_2:['s1_2'],
-  t2_1:['s2_art1','s2_lib1','s4'], t2_2:['s2_art2','s2_lib2','s5'],
-  t3_1:['s3_art1','s6'], t3_2:['s3_art2','s7','s8']
-};
-
-const TAG_TEXT = { kor:'국어', math:'수학', eng:'영어', soc:'사회', sci:'과학', art:'예술', pe:'체육', etc:'교양/기타' };
 
 // ==========================================
-// Google Login & API 엔진
+// Google 로그인 & GAS 통신 엔진
 // ==========================================
 window.addEventListener('load', () => {
   const checkGoogle = setInterval(() => {
     if (typeof google !== 'undefined' && google.accounts) {
       clearInterval(checkGoogle);
-      google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleGoogleCredential
-      });
-      const wrap = document.getElementById('g-btn-wrap');
-      wrap.innerHTML = '';
+      google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleGoogleCredential });
+      const wrap = document.getElementById('g-btn-wrap'); wrap.innerHTML = '';
       google.accounts.id.renderButton(wrap, { type: 'standard', theme: 'outline', size: 'large', width: 300, locale: 'ko' });
     }
   }, 100);
@@ -689,32 +302,24 @@ function handleGoogleCredential(response) {
   try {
     const payload = JSON.parse(atob(idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
     const email = (payload.email || '').toLowerCase();
-    
     if (!email.endsWith('@pess.cnehs.kr')) {
-      showLoginNotice('학교 계정(@pess.cnehs.kr)으로만 접속할 수 있습니다.', true);
-      return;
+      showLoginNotice('학교 공식 계정(@pess.cnehs.kr)으로만 로그인할 수 있습니다.', true); return;
     }
-    
-    showLoginNotice('계정 인증 완료. 학적 정보를 조회합니다...', false);
-    
+    showLoginNotice('인증 성공! 학적 정보를 확인 중입니다...', false);
     callApi('getStudent').then(res => {
       if (res.ok) {
         studentInfo = res;
         document.getElementById('user-display').textContent = `${res.studentId} ${res.name} (${res.email})`;
         showScreen('sc-year');
       } else {
-        showLoginNotice(res.message || '학적 정보가 등록되지 않았습니다.', true);
+        showLoginNotice(res.message || '등록된 학생 정보가 없습니다.', true);
       }
-    }).catch(err => showLoginNotice('서버 통신 실패: ' + err.message, true));
-  } catch (e) {
-    showLoginNotice('인증 오류가 발생했습니다.', true);
-  }
+    }).catch(err => showLoginNotice('서버 연결 실패: ' + err.message, true));
+  } catch (e) { showLoginNotice('로그인 처리 중 오류 발생', true); }
 }
 
 function showLoginNotice(msg, isError) {
-  const el = document.getElementById('login-status');
-  el.textContent = msg;
-  el.className = 'login-status ' + (isError ? 'error' : 'success');
+  const el = document.getElementById('login-status'); el.textContent = msg; el.style.color = isError ? '#ef4444' : '#10b981';
 }
 
 function showScreen(screenId) {
@@ -728,417 +333,277 @@ function callApi(action, extraData = {}) {
     const params = new URLSearchParams({ action, cb: cbName });
     if (idToken) params.set('token', idToken);
     if (extraData.selections) params.set('selections', JSON.stringify(extraData.selections));
-    
-    window[cbName] = (data) => {
-      delete window[cbName];
-      document.head.removeChild(script);
-      resolve(data);
-    };
-    
+    window[cbName] = (data) => { delete window[cbName]; document.head.removeChild(script); resolve(data); };
     const script = document.createElement('script');
     script.src = `${GAS_URL}?${params.toString()}`;
-    script.onerror = () => {
-      delete window[cbName];
-      document.head.removeChild(script);
-      reject(new Error('네트워크 또는 서버 응답 에러'));
-    };
+    script.onerror = () => { delete window[cbName]; document.head.removeChild(script); reject(new Error('네트워크 응답 오류')); };
     document.head.appendChild(script);
   });
 }
 
-// ==========================================
-// 포털 메뉴 컨트롤
-// ==========================================
 function chooseMenu(type) {
   if (type === 1) {
     document.getElementById('nav-student-info').textContent = `${studentInfo.studentId} ${studentInfo.name}`;
-    buildApplicationUI();
-    showScreen('sc-select');
-    fetchExistingSelections();
+    renderSimulator(); showScreen('sc-select'); fetchSavedData();
   } else {
     document.getElementById('check-user-display').textContent = `${studentInfo.studentId} ${studentInfo.name}`;
-    showScreen('sc-check');
-    renderCheckScreen();
+    showScreen('sc-check'); loadCheckData();
   }
 }
 
 // ==========================================
-// 수강신청 인터페이스 빌더
+// [2026 고유 로직] 시뮬레이터 렌더링 및 프리셋
 // ==========================================
-function buildApplicationUI() {
-  const tabsBar = document.getElementById('tabs-bar');
-  const viewsArea = document.getElementById('content-views');
-  tabsBar.innerHTML = '';
-  viewsArea.innerHTML = '';
+function renderSimulator() {
+  const tabBar = document.getElementById('tab-bar'); const contentArea = document.getElementById('content-area');
+  tabBar.innerHTML = ''; contentArea.innerHTML = '';
   
-  SEMESTERS.forEach((sem, index) => {
-    // 탭 버튼
-    const tabBtn = document.createElement('button');
-    tabBtn.id = `tab-${sem}`;
-    tabBtn.className = `tab-link ${index === 0 ? 'active' : ''}`;
-    tabBtn.textContent = SEM_LABELS[sem];
-    tabBtn.onclick = () => switchTab(sem);
-    tabsBar.appendChild(tabBtn);
+  semesterOrder.forEach((sem, idx) => {
+    const btn = document.createElement('button'); btn.id = `btn-${sem}`; btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.innerText = sem.replace('t','').replace('_','-') + '학기';
+    btn.onclick = () => openTab(sem); tabBar.appendChild(btn);
     
-    // 학기별 뷰 컨테이너
-    const viewDiv = document.createElement('div');
-    viewDiv.id = `view-${sem}`;
-    viewDiv.className = `screen ${index === 0 ? 'active' : ''}`;
-    
-    // 1. 지정 과목 영역
-    let html = `
-      <div class="section-header">
-        <span class="section-title">학교 지정 공통/일반 과목 <span class="section-badge">필수 이수</span></span>
-        <button class="btn-reset-sem" onclick="resetSemesterSelections('${sem}')">해당 학기 선택 초기화</button>
-      </div>
-      <div class="subject-grid">
-    `;
-    FIXED_SUBJECTS[sem].forEach(sub => {
-      html += `
-        <div class="subject-card fixed">
-          <div class="subject-info">
-            <div class="subject-tags">
-              <span class="tag tag-${sub.g}">${TAG_TEXT[sub.g]}</span>
-            </div>
-            <div class="subject-name">${sub.n}</div>
-            <div class="subject-meta">${sub.c}학점 · ${sub.t}과목</div>
-          </div>
-        </div>
-      `;
+    const div = document.createElement('div'); div.id = sem; div.className = 'screen' + (idx === 0 ? ' active' : '');
+    let fHtml = `<div class="section-title">학교 지정 필수 과목</div><div class="choice-grid">`;
+    fixedSubjects[sem].forEach(s => { 
+      fHtml += `<div class="subject-card bg-${s.g}"><div><strong style="font-size:1.05em;">${s.n}</strong><div style="color:var(--text-sub); margin-top:4px;">${s.c}학점 | ${s.t}</div></div></div>`; 
     });
-    html += '</div>';
+    fHtml += `</div>`;
     
-    // 2. 선택 과목 그룹 영역
-    CHOICE_GROUPS[sem].forEach(group => {
-      html += `
-        <div class="section-header" style="margin-top:36px;">
-          <span class="section-title">${group.name}</span>
-        </div>
-        <div class="subject-grid">
-      `;
-      group.list.forEach(sub => {
-        const prereq = PREREQUISITES[sub.n];
-        const alertHtml = prereq ? `<div class="subject-alert">⚠ <b>${prereq}</b> 선이수 필요</div>` : '';
-        html += `
-          <label class="subject-card" id="card-${sem}-${sub.n}">
-            <input type="checkbox" class="subject-checkbox ${group.id}" 
-                   data-sem="${sem}" data-name="${sub.n}" data-group="${sub.g}" 
-                   data-type="${sub.t}" value="${sub.c}" onchange="handleSubjectToggle(this, ${group.limit})">
-            <div class="subject-info">
-              <div class="subject-tags">
-                <span class="tag tag-${sub.g}">${TAG_TEXT[sub.g]}</span>
-              </div>
-              <div class="subject-name">${sub.n}</div>
-              <div class="subject-meta">${sub.c}학점 · ${sub.t}과목</div>
-              ${alertHtml}
-            </div>
-          </label>
-        `;
+    let cHtml = "";
+    curriculum[sem].choices.forEach(ch => {
+      cHtml += `<div class="section-title">${ch.name}</div><div class="choice-grid">`;
+      ch.list.forEach(item => {
+        const hMsg = hierarchyMap[item.n] ? `<span style="color:#ef4444; font-size:11px; display:block; font-weight:800; margin-top:6px;">⚠️ ${hierarchyMap[item.n]} 선수이수 필수</span>` : "";
+        const univIcon = coreGuide[item.n] ? `<span class="recomm-badge" title="${coreGuide[item.n]}">⭐</span>` : "";
+        cHtml += `<label class="subject-card bg-${item.g}" data-subname="${item.n}"><input type="checkbox" class="${ch.id}" data-semester="${sem}" data-name="${item.n}" data-group="${item.g}" data-type="${item.t}" value="${item.c}" onchange="handleSelect(this, ${ch.limit})"> <div style="flex:1;"><strong style="font-size:1.02em;">${item.n}</strong><div style="color:var(--text-sub); margin-top:4px;">${item.c}학점 | ${item.t}</div>${hMsg}</div>${univIcon}</label>`;
       });
-      html += '</div>';
+      cHtml += `</div>`;
     });
-    
-    viewDiv.innerHTML = html;
-    viewsArea.appendChild(viewDiv);
+    div.innerHTML = fHtml + cHtml; contentArea.appendChild(div);
   });
   
-  // 최종 확인 탭 버튼 추가
-  const finalBtn = document.createElement('button');
-  finalBtn.id = 'tab-final';
-  finalBtn.className = 'tab-link';
-  finalBtn.textContent = '최종 이수 설계서 제출';
-  finalBtn.onclick = () => switchTab('final');
-  tabsBar.appendChild(finalBtn);
-  
+  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '📊 최종 설계서 제출';
+  finalBtn.onclick = () => openTab('final'); tabBar.appendChild(finalBtn);
   updateUI();
 }
 
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#content-views .screen, #view-final').forEach(v => v.classList.remove('active'));
-  
-  const targetBtn = document.getElementById(`tab-${tabId}`);
-  if (targetBtn) targetBtn.classList.add('active');
-  
-  const targetView = document.getElementById(`view-${tabId}`);
-  if (targetView) targetView.classList.add('active');
-  
-  if (tabId === 'final') renderFinalReport();
+function openTab(id) {
+  document.querySelectorAll('#content-area .screen, #view-final').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  if (id === 'final') {
+    document.getElementById('view-final').classList.add('active');
+  } else {
+    document.getElementById(id).classList.add('active');
+  }
+  const btn = document.getElementById(`btn-${id}`); if (btn) btn.classList.add('active');
 }
 
-function handleSubjectToggle(input, limit) {
-  const groupClass = [...input.classList].find(c => c.startsWith('s'));
-  const checkedCount = document.querySelectorAll(`.${groupClass}:checked`).length;
-  
-  if (checkedCount > limit) {
-    input.checked = false;
-    alert(`해당 영역은 최대 ${limit}과목까지만 선택 가능합니다.`);
-    return;
+function applyPreset(type) {
+  clearPreset(); let targetList = []; let msg = "";
+  if (type === 'medical') {
+    targetList = ["화학", "생명과학", "세포와 물질대사", "화학 반응의 세계", "보건", "생물의 유전"];
+    msg = "의학·보건 계열 핵심 과목이 강조되었습니다. 2학년 기초 다지기 후 3학년 진로 과목 선택을 권장합니다.";
   }
+  if (type === 'engineering') {
+    targetList = ["물리학", "화학", "역학과 에너지", "인공지능 수학", "프로그래밍", "미적분 II", "기하", "전자기와 양자"];
+    msg = "이공·IT 계열 핵심 과목이 강조되었습니다. 미적분과 기하는 공과대학 필수 권장 사항입니다.";
+  }
+  if (type === 'humanities') {
+    targetList = ["사회와 문화", "정치", "경제", "법과 사회", "심화 영어", "세계사", "언어생활 탐구"];
+    msg = "인문·사회·상경 계열 핵심 과목이 강조되었습니다. 경제와 정치는 상경/사회과학 계열 진학 시 매우 유리합니다.";
+  }
+  if (type === 'edu') {
+    targetList = ["사회와 문화", "현대사회와 윤리", "인간과 심리", "교육의 이해", "독서 토론과 글쓰기"];
+    msg = "사범·교육 계열 핵심 과목이 강조되었습니다. 인간에 대한 이해 및 의사소통 중심 과목이 중요합니다.";
+  }
+  targetList.forEach(name => {
+    document.querySelectorAll(`[data-subname="${name}"]`).forEach(c => c.classList.add('highlight-preset'));
+  });
+  alert(`[진로 설계 가이드]\n\n${msg}`);
+}
+
+function clearPreset() { document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('highlight-preset')); }
+
+function handleSelect(el, limit) {
+  if (document.querySelectorAll(`.${el.className}:checked`).length > limit) { el.checked = false; alert(`해당 영역은 최대 ${limit}과목만 선택 가능합니다.`); }
   updateUI();
-}
-
-function resetSemesterSelections(sem) {
-  if (confirm(`${SEM_LABELS[sem]}의 선택 내역을 모두 초기화하시겠습니까?`)) {
-    document.querySelectorAll(`input[data-sem="${sem}"]:checked`).forEach(chk => chk.checked = false);
-    updateUI();
-  }
 }
 
 // ==========================================
-// 학점 계산 및 실시간 상태 갱신
+// [2026 고유 연산] 위계성 / 중복 차단 / 학점 합계
 // ==========================================
 function updateUI() {
-  const selectedBySem = {};
-  SEMESTERS.forEach(s => {
-    selectedBySem[s] = Array.from(document.querySelectorAll(`input[data-sem="${s}"]:checked`)).map(c => c.getAttribute('data-name'));
-  });
-  
-  let credits = { fixed: 0, select: 0, kms: 0, soc: 0, sci: 0, art: 0, pe: 0, lib: 0 };
-  
-  // 지정 과목 학점 합산
-  SEMESTERS.forEach(s => {
-    FIXED_SUBJECTS[s].forEach(sub => {
-      credits.fixed += sub.c;
-      if (['kor','math','eng'].includes(sub.g)) credits.kms += sub.c;
-      if (sub.g === 'soc') credits.soc += sub.c;
-      if (sub.g === 'sci') credits.sci += sub.c;
-      if (sub.g === 'art') credits.art += sub.c;
-      if (sub.g === 'pe') credits.pe += sub.c;
-      if (sub.g === 'etc') credits.lib += sub.c;
+  let stats = { fixed: 0, select: 0, kms: 0, soc: 0, sci: 0, art: 0, pe: 0, lib: 0 };
+  const selBySem = {};
+  semesterOrder.forEach(sem => {
+    selBySem[sem] = Array.from(document.querySelectorAll(`input[data-semester="${sem}"]:checked`)).map(i => i.getAttribute('data-name'));
+    fixedSubjects[sem].forEach(s => {
+      stats.fixed += s.c;
+      if (["kor","math","eng"].includes(s.g)) stats.kms += s.c;
+      if (s.g === "soc") stats.soc += s.c; if (s.g === "sci") stats.sci += s.c;
+      if (s.g === "art") stats.art += s.c; if (s.g === "pe") stats.pe += s.c;
+      if (s.g === "etc") stats.lib += s.c;
     });
   });
   
-  // 선택 과목 학점 합산 및 조건부 카드 비활성화
-  document.querySelectorAll('input.subject-checkbox').forEach(chk => {
-    const name = chk.getAttribute('data-name');
-    const sem = chk.getAttribute('data-sem');
-    const semIndex = SEMESTERS.indexOf(sem);
-    const card = chk.closest('.subject-card');
+  document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+    const name = input.getAttribute('data-name'); const sem = input.getAttribute('data-semester'); const idx = semesterOrder.indexOf(sem);
+    const card = input.closest('.subject-card');
     
-    // 타 학기 중복 선택 제한
-    let isUsedInOtherSem = SEMESTERS.some((s, idx) => idx !== semIndex && selectedBySem[s].includes(name));
+    // 학기 간 중복 선택 검증
+    let isUsed = false; semesterOrder.forEach(s => { if (s !== sem && selBySem[s].includes(name)) isUsed = true; });
     
-    // 선수과목 미이수 검증
-    let isBlockedByPrereq = false;
-    const prereq = PREREQUISITES[name];
-    if (prereq) {
-      let prereqMet = false;
-      for (let i = 0; i < semIndex; i++) {
-        if (selectedBySem[SEMESTERS[i]].includes(prereq)) { prereqMet = true; break; }
-      }
-      if (!prereqMet) isBlockedByPrereq = true;
+    // 선수과목 위계성 검증
+    let isBlocked = false;
+    if (hierarchyMap[name]) {
+      const req = hierarchyMap[name]; let ok = false;
+      for (let i = 0; i < idx; i++) { if (selBySem[semesterOrder[i]].includes(req)) ok = true; }
+      if (!ok) isBlocked = true;
     }
     
-    chk.disabled = isUsedInOtherSem || isBlockedByPrereq;
-    if (chk.disabled) card.classList.add('disabled');
-    else card.classList.remove('disabled');
+    input.disabled = isUsed || isBlocked;
+    if (input.disabled) card.classList.add('disabled-card'); else card.classList.remove('disabled-card');
     
-    if (chk.checked) {
-      card.classList.add('selected');
-      const val = parseInt(chk.value);
-      const grp = chk.getAttribute('data-group');
-      credits.select += val;
-      if (['kor','math','eng'].includes(grp)) credits.kms += val;
-      if (grp === 'soc') credits.soc += val;
-      if (grp === 'sci') credits.sci += val;
-      if (grp === 'art') credits.art += val;
-      if (grp === 'pe') credits.pe += val;
-      if (grp === 'etc' || name === '삶과 종교') credits.lib += val;
-    } else {
-      card.classList.remove('selected');
+    if (input.checked) {
+      const c = parseInt(input.value); const g = input.getAttribute('data-group');
+      stats.select += c;
+      if (["kor","math","eng"].includes(g)) stats.kms += c;
+      if (g === "soc") stats.soc += c; if (g === "sci") stats.sci += c;
+      if (g === "art") stats.art += c; if (g === "pe") stats.pe += c;
+      if (g === "etc" || name.includes("삶과 종교")) stats.lib += c;
     }
   });
   
-  const totalCredits = credits.fixed + credits.select;
+  document.getElementById('fixed-cr').innerText = stats.fixed;
+  document.getElementById('select-cr').innerText = stats.select;
+  const total = stats.fixed + stats.select;
+  document.getElementById('total-cr').innerText = total;
   
-  document.getElementById('val-fixed').textContent = credits.fixed;
-  document.getElementById('val-select').textContent = credits.select;
-  document.getElementById('val-total').textContent = totalCredits;
+  const elKms = document.getElementById('kms-val'); elKms.innerText = stats.kms;
+  elKms.className = stats.kms > 81 ? 'val warning' : 'val';
   
-  const elKms = document.getElementById('stat-kms');
-  elKms.textContent = credits.kms;
-  elKms.className = `metric-stat ${credits.kms > 81 ? 'warn' : ''}`;
+  const elLib = document.getElementById('stat-lib'); elLib.innerText = stats.lib;
+  elLib.className = stats.lib < 16 ? 'val warning' : 'val';
   
-  const elLib = document.getElementById('stat-lib');
-  elLib.textContent = credits.lib;
-  elLib.className = `metric-stat ${credits.lib < 16 ? 'warn' : ''}`;
+  document.getElementById('stat-soc').innerText = stats.soc; document.getElementById('stat-sci').innerText = stats.sci;
+  document.getElementById('stat-art').innerText = stats.art; document.getElementById('stat-pe').innerText = stats.pe;
   
-  document.getElementById('stat-soc').textContent = credits.soc;
-  document.getElementById('stat-sci').textContent = credits.sci;
-  document.getElementById('stat-art').textContent = credits.art;
-  document.getElementById('stat-pe').textContent = credits.pe;
+  document.getElementById('r-total').innerText = total; document.getElementById('r-kms').innerText = stats.kms;
+  document.getElementById('r-lib').innerText = stats.lib;
+  document.getElementById('r-student').innerText = `${studentInfo.studentId} ${studentInfo.name}`;
+  document.getElementById('r-career').innerText = document.getElementById('career-name').value || "미입력";
   
-  // 탭별 진행 완료 점 표시
-  SEMESTERS.forEach(s => {
-    const isDone = CHOICE_GROUPS[s].every(grp => {
-      return document.querySelectorAll(`.${grp.id}:checked`).length === grp.limit;
-    });
-    const tabBtn = document.getElementById(`tab-${s}`);
-    if (tabBtn) {
-      if (isDone) tabBtn.classList.add('completed');
-      else tabBtn.classList.remove('completed');
-    }
+  buildReport();
+}
+
+function buildReport() {
+  const grid = document.getElementById('report-grid'); grid.innerHTML = "";
+  const semNames = { t1_1: "1학년 1학기", t1_2: "1학년 2학기", t2_1: "2학년 1학기", t2_2: "2학년 2학기", t3_1: "3학년 1학기", t3_2: "3학년 2학기" };
+  semesterOrder.forEach(sem => {
+    const fix = fixedSubjects[sem]; const sel = Array.from(document.querySelectorAll(`input[data-semester="${sem}"]:checked`));
+    let listHtml = "";
+    fix.forEach(s => { listHtml += `<li><span><strong>${s.n}</strong></span><span>${s.t} / ${s.c} <span class="badge-s b-fixed">지정</span></span></li>`; });
+    sel.forEach(i => { listHtml += `<li><span style="color:var(--navy)"><strong>${i.getAttribute('data-name')}</strong></span><span>${i.getAttribute('data-type')} / ${i.value} <span class="badge-s b-sel">선택</span></span></li>`; });
+    grid.innerHTML += `<div class="report-card"><h3 style="font-size:0.95em; color:var(--navy); border-bottom:1px solid #cbd5e1; padding-bottom:6px; margin-bottom:8px;">${semNames[sem]}</h3><ul class="report-list">${listHtml}</ul></div>`;
   });
 }
 
 // ==========================================
-// 기존 내역 불러오기 및 모달
+// 기존 내역 연동 및 서버 최종 제출
 // ==========================================
-function fetchExistingSelections() {
+function fetchSavedData() {
   callApi('getSubmission').then(res => {
     if (res.ok && res.hasSubmitted) {
-      savedSelections = res.selections;
-      savedTimestamp = res.timestamp || '';
-      document.getElementById('btn-prev-modal').style.display = 'inline-block';
-      
       ALL_GROUP_IDS.forEach(gid => {
         (res.selections[gid] || []).forEach(subName => {
-          const targetChk = document.querySelector(`.${gid}[data-name="${subName}"]`);
-          if (targetChk) targetChk.checked = true;
+          const target = document.querySelector(`.${gid}[data-name="${subName}"]`);
+          if (target) target.checked = true;
         });
       });
       updateUI();
     }
-  }).catch(() => {});
-}
-
-function openPrevModal() {
-  if (!savedSelections) return;
-  document.getElementById('modal-time-str').textContent = `최초 제출 일시: ${savedTimestamp}`;
-  const container = document.getElementById('modal-grid-container');
-  container.innerHTML = '';
-  
-  SEMESTERS.forEach(sem => {
-    let itemsHtml = '';
-    FIXED_SUBJECTS[sem].forEach(s => {
-      itemsHtml += `<li class="report-item"><span class="name">${s.n}</span><span class="meta">${s.c}학점</span></li>`;
-    });
-    
-    SEM_GROUP_MAP[sem].forEach(gid => {
-      (savedSelections[gid] || []).forEach(name => {
-        itemsHtml += `<li class="report-item custom"><span class="name">${name}</span><span class="meta">선택과목</span></li>`;
-      });
-    });
-    container.innerHTML += `<div class="report-column"><h4>${SEM_LABELS[sem]}</h4><ul class="report-list">${itemsHtml}</ul></div>`;
-  });
-  document.getElementById('modal-prev').classList.add('open');
-}
-
-function closePrevModal() {
-  document.getElementById('modal-prev').classList.remove('open');
-}
-
-// ==========================================
-// 최종 이수 설계서 렌더링 및 서버 제출
-// ==========================================
-function renderFinalReport() {
-  document.getElementById('rep-student').textContent = `${studentInfo.studentId} ${studentInfo.name}`;
-  document.getElementById('rep-career').textContent = document.getElementById('career-input').value.trim() || '미지정';
-  
-  const container = document.getElementById('report-container');
-  container.innerHTML = '';
-  
-  SEMESTERS.forEach(sem => {
-    let html = `<div class="report-column"><h4>${SEM_LABELS[sem]}</h4><ul class="report-list">`;
-    FIXED_SUBJECTS[sem].forEach(s => {
-      html += `<li class="report-item"><span class="name">${s.n}</span><span class="meta">${s.c}학점 · 공통</span></li>`;
-    });
-    document.querySelectorAll(`input[data-sem="${sem}"]:checked`).forEach(chk => {
-      html += `<li class="report-item custom"><span class="name">${chk.getAttribute('data-name')}</span><span class="meta">${chk.value}학점 · 선택</span></li>`;
-    });
-    html += '</ul></div>';
-    container.innerHTML += html;
   });
 }
 
-async function submitApplication() {
-  const kms = parseInt(document.getElementById('stat-kms').textContent);
-  const lib = parseInt(document.getElementById('stat-lib').textContent);
-  const total = parseInt(document.getElementById('val-total').textContent);
-  const feedback = document.getElementById('submit-feedback');
-  const btn = document.getElementById('btn-submit');
+async function submitToServer() {
+  const total = parseInt(document.getElementById('total-cr').innerText);
+  const kms = parseInt(document.getElementById('kms-val').innerText);
+  const lib = parseInt(document.getElementById('stat-lib').innerText);
   
   let errors = [];
   if (total !== 174) errors.push(`총 이수 학점은 정확히 174학점이어야 합니다. (현재 ${total}학점)`);
-  if (kms > 81) errors.push(`국·영·수 기초영역 학점 합계는 81학점을 초과할 수 없습니다. (현재 ${kms}학점)`);
+  if (kms > 81) errors.push(`국·영·수 기초영역 합계는 81학점을 초과할 수 없습니다. (현재 ${kms}학점)`);
   if (lib < 16) errors.push(`교양 영역 학점 합계는 16학점 이상이어야 합니다. (현재 ${lib}학점)`);
   
-  ALL_GROUP_IDS.forEach(gid => {
-    if (document.querySelectorAll(`.${gid}:checked`).length < GROUP_LIMITS[gid]) {
-      errors.push('과목 선택이 완료되지 않은 학기나 영역이 존재합니다.');
-    }
-  });
-  
   if (errors.length > 0) {
-    alert('⚠️ 제출 요건 검증 실패\n\n' + [...new Set(errors)].join('\n'));
-    return;
+    alert('⚠️ 학점 검증 불합격\n\n' + errors.join('\n')); return;
   }
   
-  btn.disabled = true;
-  feedback.style.color = 'var(--text-sub)';
-  feedback.textContent = '제출 기간 개폐 여부를 확인하고 있습니다...';
+  const btn = document.getElementById('btn-submit-server'); const fb = document.getElementById('submit-feedback');
+  btn.disabled = true; fb.style.color = 'var(--text-sub)'; fb.textContent = '제출 기한 개폐 여부를 확인하고 있습니다...';
   
   try {
-    const statusRes = await callApi('isSubmitOpen');
-    if (!statusRes.open) {
-      feedback.style.color = 'var(--danger)';
-      feedback.textContent = '현재 교육과정 선택 기간이 마감되어 제출하실 수 없습니다.';
-      btn.disabled = false;
-      return;
+    const status = await callApi('isSubmitOpen');
+    if (!status.open) {
+      fb.style.color = '#ef4444'; fb.textContent = '현재 과목 선택 제출 기간이 마감되었습니다.'; btn.disabled = false; return;
     }
-    
-    feedback.textContent = '서버에 수강 내역을 암호화하여 저장하고 있습니다...';
-    
+    fb.textContent = '서버 구글 시트에 안전하게 저장하고 있습니다...';
     const payload = {};
     ALL_GROUP_IDS.forEach(gid => {
       payload[gid] = Array.from(document.querySelectorAll(`.${gid}:checked`)).map(c => c.getAttribute('data-name'));
     });
-    
     const result = await callApi('submit', { selections: payload });
     if (result.ok) {
-      feedback.style.color = 'var(--success)';
-      feedback.textContent = result.message || '이수 설계서 제출이 성공적으로 완료되었습니다.';
-      fetchExistingSelections();
+      fb.style.color = '#10b981'; fb.textContent = result.message || '이수 설계서 제출이 완벽하게 완료되었습니다!';
     } else {
-      feedback.style.color = 'var(--danger)';
-      feedback.textContent = result.message || '제출 처리 중 오류가 발생했습니다.';
+      fb.style.color = '#ef4444'; fb.textContent = result.message || '제출 저장 중 오류가 발생했습니다.';
     }
-  } catch (e) {
-    feedback.style.color = 'var(--danger)';
-    feedback.textContent = '통신 에러: ' + e.message;
-  }
+  } catch (e) { fb.style.color = '#ef4444'; fb.textContent = '통신 에러: ' + e.message; }
   btn.disabled = false;
 }
 
 // ==========================================
-// 1학년 내역 조회 화면
+// 내역 출력 및 엑셀 / 이미지 변환
 // ==========================================
-function renderCheckScreen() {
+function exportToExcel() {
+  const data = [["학기", "진로", document.getElementById('career-name').value], ["학기", "과목명", "유형", "학점", "이수구분"]];
+  semesterOrder.forEach(sem => {
+    fixedSubjects[sem].forEach(s => data.push([sem, s.n, s.t, s.c, "학교지정"]));
+    document.querySelectorAll(`input[data-semester="${sem}"]:checked`).forEach(i => {
+      data.push([sem, i.getAttribute('data-name'), i.getAttribute('data-type'), i.value, "학생선택"]);
+    });
+  });
+  const worksheet = XLSX.utils.aoa_to_sheet(data); const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "교육과정설계");
+  XLSX.writeFile(workbook, `${studentInfo.studentId}_${studentInfo.name}_교육과정설계서.xlsx`);
+}
+
+function saveAsImage() {
+  html2canvas(document.getElementById("capture-area"), { scale: 2 }).then(canvas => {
+    const link = document.createElement('a'); link.download = `${studentInfo.studentId}_${studentInfo.name}_교육과정로드맵.png`;
+    link.href = canvas.toDataURL(); link.click();
+  });
+}
+
+function loadCheckData() {
   const contentArea = document.getElementById('check-content');
-  contentArea.innerHTML = '<div style="text-align:center; padding:48px;"><span class="spinner"></span> 데이터를 불러오는 중...</div>';
-  
+  contentArea.innerHTML = '<div style="text-align:center; padding:40px;"><span class="spinner"></span> 제출 내역 불러오는 중...</div>';
   callApi('getSubmission').then(res => {
     if (!res.ok || !res.hasSubmitted) {
-      contentArea.innerHTML = '<div style="text-align:center; padding:48px; color:var(--text-muted);">제출된 과목 선택 내역이 없습니다.</div>';
-      return;
+      contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub);">제출된 과목 선택 내역이 없습니다.</div>'; return;
     }
-    
-    let html = `<div class="report-paper"><div class="report-header" style="margin-bottom:20px;"><h2>저장된 교육과정 설계서</h2><p class="report-meta">최근 제출 시각: ${res.timestamp || '-'}</p></div><div class="report-grid">`;
-    SEMESTERS.forEach(sem => {
-      html += `<div class="report-column"><h4>${SEM_LABELS[sem]}</h4><ul class="report-list">`;
-      FIXED_SUBJECTS[sem].forEach(s => {
-        html += `<li class="report-item"><span class="name">${s.n}</span><span class="meta">${s.c}학점</span></li>`;
-      });
-      SEM_GROUP_MAP[sem].forEach(gid => {
-        (res.selections[gid] || []).forEach(name => {
-          html += `<li class="report-item custom"><span class="name">${name}</span><span class="meta">선택과목</span></li>`;
-        });
-      });
+    let html = `<div class="report-print-area"><div class="report-header" style="margin-bottom:20px;"><h2>저장된 교육과정 설계서</h2><p style="color:var(--text-sub); font-size:0.85em;">최근 제출 시각: ${res.timestamp || '-'}</p></div><div class="report-grid">`;
+    const semNames = { t1_1: "1학년 1학기", t1_2: "1학년 2학기", t2_1: "2학년 1학기", t2_2: "2학년 2학기", t3_1: "3학년 1학기", t3_2: "3학년 2학기" };
+    semesterOrder.forEach(sem => {
+      html += `<div class="report-card"><h3 style="font-size:0.95em; color:var(--navy); border-bottom:1px solid #cbd5e1; padding-bottom:6px; margin-bottom:8px;">${semNames[sem]}</h3><ul class="report-list">`;
+      fixedSubjects[sem].forEach(s => { html += `<li><span><strong>${s.n}</strong></span><span>${s.t} / ${s.c}</span></li>`; });
+      const selList = [];
+      curriculum[sem].choices.forEach(ch => { (res.selections[ch.id] || []).forEach(name => selList.push(name)); });
+      selList.forEach(name => { html += `<li><span style="color:var(--navy)"><strong>${name}</strong></span><span>선택과목</span></li>`; });
       html += '</ul></div>';
     });
-    html += '</div></div>';
-    contentArea.innerHTML = html;
+    html += '</div></div>'; contentArea.innerHTML = html;
   });
 }
 </script>
