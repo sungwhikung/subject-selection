@@ -289,7 +289,7 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 // ===========================
 // ⚙ CONFIG - 여기를 수정하세요
 // ===========================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7IuGYo1VuiZBn1-FKQHdxUL8quDE1JJLwwraKrJVLrQIrFZY3LYlXnd698QB5wn8/exec';  // GAS 배포 URL
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwJ8If9ReCICWFaI3ToT0M4Yt-y1aKCafHNNcGEriRcikH4_9LE5ukJ3L9e1loOq1M/exec';  // GAS 배포 URL
 
 // ===========================
 // 상태
@@ -406,18 +406,32 @@ function showScreen(id) {
 }
 
 // ===========================
-// API 호출
+// API 호출 (JSONP - CORS 우회)
 // ===========================
-async function api(action, extra = {}) {
-  const body = JSON.stringify({ action, token: idToken, ...extra });
-  const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body,
-    redirect: 'follow',
+function api(action, extra = {}) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gc' + Date.now() + Math.random().toString(36).slice(2, 7);
+    const params = new URLSearchParams();
+    params.set('action', action);
+    if (idToken) params.set('token', idToken);
+    if (extra.selections) params.set('selections', JSON.stringify(extra.selections));
+    params.set('cb', cbName);
+
+    window[cbName] = (data) => {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(data);
+    };
+
+    const script = document.createElement('script');
+    script.src = GAS_URL + '?' + params.toString();
+    script.onerror = () => {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('서버 연결 실패. GAS 배포 URL 및 설정을 확인해주세요.'));
+    };
+    document.head.appendChild(script);
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
 }
 
 // ===========================
