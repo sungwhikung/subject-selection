@@ -16,12 +16,12 @@
 body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: #333; min-height: 100vh; }
 
 /* ===== 화면 전환 ===== */
-.screen { display: none; min-height: 100vh; }
-.screen.active { display: block; }
+.screen { display: none !important; min-height: 100vh; }
+.screen.active { display: block !important; }
 
 /* ===== 로그인 화면 ===== */
 #sc-login { display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a3a5f 0%, #0d2137 100%); }
-#sc-login.active { display: flex; }
+#sc-login.active { display: flex !important; }
 .login-box { background: white; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
 .login-logo { font-size: 2.5em; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
 .login-sub { font-size: 0.9em; color: #64748b; margin-bottom: 24px; }
@@ -33,7 +33,7 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 
 /* ===== 학년 선택 화면 ===== */
 #sc-year { display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-#sc-year.active { display: flex; }
+#sc-year.active { display: flex !important; }
 .year-box { max-width: 600px; width: 100%; }
 .year-head { text-align: center; margin-bottom: 32px; }
 .year-head h2 { font-size: 1.5em; font-weight: 800; color: var(--navy); }
@@ -172,24 +172,10 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
     <div class="login-sub">교육과정 과목 선택 시스템</div>
     <hr class="login-divider">
     <p class="login-desc">본인의 학교 계정(<strong>@pess.cnehs.kr</strong>)으로<br>로그인해주세요.</p>
-    <div id="g-btn-wrap">
-      <div id="g_id_onload"
-        data-client_id="132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleusercontent.com"
-        data-callback="handleCredential"
-        data-auto_select="true"
-        data-use_fedcm_for_prompt="true">
-      </div>
-      <div class="g_id_signin"
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="sign_in_with"
-        data-shape="rectangular"
-        data-locale="ko"
-        data-logo_alignment="left">
-      </div>
+    <div id="g-btn-wrap" style="min-height:44px; display:flex; justify-content:center; align-items:center;">
+      <span class="spinner"></span>
     </div>
-    <p id="login-msg" class="login-msg"></p>
+    <p id="login-msg" class="login-msg" style="font-size:0.9em; padding:10px; border-radius:8px; margin-top:12px;"></p>
   </div>
 </div>
 
@@ -303,7 +289,7 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 // ===========================
 // ⚙ CONFIG - 여기를 수정하세요
 // ===========================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx5LnJkbHEhoSJFzo6yjoOqvIoJto72WPBS9h2VKjXO3M7uhKHia8yC1UkxiqqBsKg/exec';  // GAS 배포 URL
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7IuGYo1VuiZBn1-FKQHdxUL8quDE1JJLwwraKrJVLrQIrFZY3LYlXnd698QB5wn8/exec';  // GAS 배포 URL
 
 // ===========================
 // 상태
@@ -313,41 +299,102 @@ let student = null; // { studentId, name, email }
 let prevSelections = null; // 이전 제출 내역
 let prevTimestamp = '';
 
+const CLIENT_ID = '132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleusercontent.com';
+
 // ===========================
-// Google 로그인
+// Google 로그인 초기화
 // ===========================
+window.addEventListener('load', () => {
+  // GAS URL 미설정 체크
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    showLoginMsg('⚠ GAS 배포 URL이 설정되지 않았습니다. index.html의 GAS_URL을 채워주세요.', true);
+  }
+  // GSI 라이브러리가 로드될 때까지 대기
+  const tryInit = setInterval(() => {
+    if (typeof google !== 'undefined' && google.accounts) {
+      clearInterval(tryInit);
+      initGoogleSignIn();
+    }
+  }, 100);
+  setTimeout(() => {
+    clearInterval(tryInit);
+    if (typeof google === 'undefined') {
+      document.getElementById('g-btn-wrap').innerHTML =
+        '<p style="color:#b91c1c;font-size:0.85em">Google 로그인 라이브러리를 불러오지 못했습니다.<br>인터넷 연결을 확인하고 새로고침 해주세요.</p>';
+    }
+  }, 5000);
+});
+
+function initGoogleSignIn() {
+  google.accounts.id.initialize({
+    client_id: CLIENT_ID,
+    callback: handleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  });
+  const btnWrap = document.getElementById('g-btn-wrap');
+  btnWrap.innerHTML = '';
+  google.accounts.id.renderButton(btnWrap, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'sign_in_with',
+    shape: 'rectangular',
+    locale: 'ko',
+    logo_alignment: 'left',
+    width: 280,
+  });
+}
+
 function handleCredential(response) {
   idToken = response.credential;
   try {
-    const payload = JSON.parse(atob(idToken.split('.')[1]));
+    // JWT payload 디코딩 (base64url)
+    const b64 = idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
     const email = (payload.email || '').toLowerCase();
+
     if (!email.endsWith('@pess.cnehs.kr')) {
-      showLoginMsg('학교 계정(@pess.cnehs.kr)으로만 이용할 수 있습니다.', true);
+      showLoginMsg(`현재 로그인된 계정: ${email}\n학교 계정(@pess.cnehs.kr)으로만 이용할 수 있습니다.\nGoogle에서 학교계정으로 전환 후 다시 시도해주세요.`, true);
       idToken = null;
       return;
     }
-    showLoginMsg('', false);
-    showScreen('sc-year');
-    document.getElementById('year-student').textContent = '계정 확인 중...';
+
+    showLoginMsg(`✓ ${email} 로 로그인됨. 학생 정보 조회 중...`, false);
+    document.getElementById('year-student').textContent = `${email} — 정보 조회 중...`;
+
+    if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+      showLoginMsg('GAS 배포 URL이 설정되지 않았습니다. index.html의 GAS_URL을 입력해주세요.', true);
+      return;
+    }
+
     api('getStudent').then(res => {
       if (res.ok) {
         student = res;
+        showLoginMsg('', false);
+        showScreen('sc-year');
         document.getElementById('year-student').textContent =
           `학번 ${res.studentId} / ${res.name} 님 (${res.email})`;
       } else {
-        document.getElementById('year-msg').textContent = res.message;
-        document.getElementById('year-student').textContent = email + ' (학생 정보를 찾지 못했습니다)';
+        showLoginMsg('학생 정보 조회 실패: ' + res.message, true);
+        idToken = null;
       }
+    }).catch(err => {
+      showLoginMsg('서버 연결 실패: ' + err.message + '\nGAS 배포 URL과 배포 설정을 확인해주세요.', true);
+      idToken = null;
     });
   } catch(e) {
-    showLoginMsg('로그인 처리 중 오류가 발생했습니다.', true);
+    showLoginMsg('로그인 처리 오류: ' + e.message, true);
   }
 }
 
 function showLoginMsg(msg, isErr) {
   const el = document.getElementById('login-msg');
+  el.style.whiteSpace = 'pre-line';
   el.textContent = msg;
-  el.className = 'login-msg' + (isErr ? ' err' : '');
+  el.style.background = msg ? (isErr ? '#fef2f2' : '#f0fdf4') : '';
+  el.style.color = isErr ? '#b91c1c' : '#166534';
+  el.style.padding = msg ? '10px' : '';
 }
 
 // ===========================
@@ -366,8 +413,10 @@ async function api(action, extra = {}) {
   const res = await fetch(GAS_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body
+    body,
+    redirect: 'follow',
   });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
