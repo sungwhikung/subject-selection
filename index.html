@@ -30,12 +30,37 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 .login-card { background: var(--surface); border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; border-top: 8px solid var(--navy); }
 
 /* 포털 및 메뉴 화면 공통 */
-.center-wrap { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 40px 20px; }
-.portal-container { max-width: 800px; width: 100%; }
+.center-wrap { min-height: 100vh; display: flex !important; padding: 40px 20px; }
+.center-wrap > .portal-container { margin: auto; max-width: 1000px; width: 100%; }
 .menu-grid { display: grid; gap: 16px; margin-top: 24px; }
 .menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
 .menu-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); }
 .badge { font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px; width: fit-content; margin-bottom: 12px; }
+
+/* =======================================
+   새로 디자인된 입학년도 선택 대문 (Year Card) 
+======================================= */
+.year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 32px; }
+.year-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+  padding: 48px 32px; text-align: center; cursor: pointer; 
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+/* 마우스 오버 시 확 커지는 애니메이션 */
+.year-card:hover { 
+  transform: scale(1.08); /* 크기 8% 확대 */
+  box-shadow: 0 25px 30px -5px rgba(0,0,0,0.15), 0 15px 15px -5px rgba(0,0,0,0.08); 
+  border-color: var(--navy); 
+  z-index: 10; 
+}
+.year-card.highlight { border: 3px solid var(--navy); background: linear-gradient(to bottom, #ffffff, #f4f8fc); }
+.year-card.disabled { opacity: 0.55; cursor: not-allowed; background: #f8fafc; }
+.year-card.disabled:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border-color: var(--border); z-index: 1; }
+
+.year-title { font-size: 1.6em; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+.year-desc { font-size: 0.95em; color: var(--text-sub); line-height: 1.6; }
 
 /* 메인 앱 영역 */
 .app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px; }
@@ -137,33 +162,33 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-main-portal" class="screen center-wrap">
   <div class="portal-container">
     <div style="text-align:center;">
-      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">논산대건고 수강신청 포털</h2>
-      <p style="color:var(--text-sub);">본인의 입학 연도에 맞는 시스템을 선택해 주세요.</p>
+      <h2 style="font-size:2em; font-weight:800; color:var(--navy);">논산대건고 수강신청 포털</h2>
+      <p style="color:var(--text-sub); font-size:1.05em; margin-top:8px;">본인의 입학 연도에 맞는 시스템을 선택해 주세요.</p>
     </div>
     
-    <div style="background:var(--surface); padding:14px 20px; border-radius:12px; border:1px solid var(--border); margin-top:24px; display:flex; justify-content:space-between; align-items:center;">
-      <div style="font-weight:700; font-size:0.95em;" id="user-display-main">사용자 정보 확인 중...</div>
-      <button onclick="location.reload()" class="btn-back" style="font-size:0.8em;">로그아웃</button>
+    <div style="background:var(--surface); padding:16px 24px; border-radius:12px; border:1px solid var(--border); margin-top:32px; display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-weight:700; font-size:1em;" id="user-display-main">사용자 정보 확인 중...</div>
+      <button onclick="location.reload()" class="btn-back" style="font-size:0.85em;">로그아웃</button>
     </div>
     
-    <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));">
+    <div class="year-grid">
       
-      <div class="menu-card" onclick="window.open('https://script.google.com/a/macros/pess.cnehs.kr/s/AKfycbw3OJYxvInH1dRXjO-zZwPpuR70aSPbMByvbZIMHIgpChy5vt6lKwggM-CUryASd2BSWg/exec', '_blank')">
+      <div class="year-card" onclick="window.open('https://script.google.com/a/macros/pess.cnehs.kr/s/AKfycbw3OJYxvInH1dRXjO-zZwPpuR70aSPbMByvbZIMHIgpChy5vt6lKwggM-CUryASd2BSWg/exec', '_blank')">
         <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용 시스템</span>
-        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">2025학년도 입학생</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">기존 시스템으로 이동하여 확정된 2학년 선택과목 내역을 확인합니다.</p>
+        <div class="year-title">2025학년도 입학생</div>
+        <div class="year-desc">기존 시스템으로 이동하여 확정된 2학년 선택과목 내역을 확인합니다.</div>
       </div>
 
-      <div class="menu-card" style="border: 2px solid var(--navy); box-shadow: 0 4px 12px rgba(26,58,95,0.1);" onclick="showScreen('sc-2026-menu')">
+      <div class="year-card highlight" onclick="showScreen('sc-2026-menu')">
         <span class="badge" style="background:#e0f2fe; color:#0369a1;">과목선택 접수중</span>
-        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">2026학년도 입학생</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">2026 신입생 전용 시뮬레이터를 통해 3년간의 수강신청을 진행합니다.</p>
+        <div class="year-title" style="color:var(--navy); font-size:1.8em;">2026학년도 입학생</div>
+        <div class="year-desc" style="color:var(--text-main); font-weight:600;">2026 신입생 전용 시뮬레이터를 통해 3년간의 수강신청을 진행합니다.</div>
       </div>
 
-      <div class="menu-card" style="opacity: 0.65; cursor: not-allowed;" onclick="alert('2027학년도 입학생 전용 시스템은 현재 오픈 준비 중입니다.')">
+      <div class="year-card disabled" onclick="alert('2027학년도 입학생 전용 시스템은 현재 오픈 준비 중입니다.')">
         <span class="badge" style="background:#fef3c7; color:#b45309;">오픈 예정</span>
-        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">2027학년도 입학생</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">내년도 입학생을 위한 시스템으로 현재는 접근하실 수 없습니다.</p>
+        <div class="year-title">2027학년도 입학생</div>
+        <div class="year-desc">내년도 입학생을 위한 시스템으로 현재는 접근하실 수 없습니다.</div>
       </div>
 
     </div>
@@ -171,7 +196,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 </div>
 
 <div id="sc-2026-menu" class="screen center-wrap">
-  <div class="portal-container">
+  <div class="portal-container" style="max-width: 800px;">
     <div class="top-nav" style="margin-bottom:0;">
       <button class="btn-back" onclick="showScreen('sc-main-portal')">← 입학년도 선택으로</button>
     </div>
@@ -183,13 +208,13 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
     <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
       <div class="menu-card" onclick="chooseMenu2026(1)">
         <span class="badge" style="background:#e0f2fe; color:#0369a1;">신청접수 중</span>
-        <h3 style="font-size:1.25em; font-weight:800; margin:0 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 설계서를 제출합니다.</p>
+        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
+        <p style="font-size:0.9em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 설계서를 제출합니다.</p>
       </div>
       <div class="menu-card" onclick="chooseMenu2026(2)">
         <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용</span>
-        <h3 style="font-size:1.25em; font-weight:800; margin:0 0 8px;">제출 내역 조회 및 출력</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장합니다.</p>
+        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">제출 내역 조회 및 출력</h3>
+        <p style="font-size:0.9em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장합니다.</p>
       </div>
     </div>
   </div>
@@ -279,7 +304,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 // ==========================================
 // [설정] 구글 앱스크립트 배포 URL 입력 필수
 // ==========================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz6kqiHVz6mC3s2BA7HH8h7BTiG8B5NZRrgh0wSpVYIMn1nb0v2kMEH5dg1L3BndaA/exec'; // 💡여기에 2026년용 배포 주소가 맞는지 확인하세요!
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz6kqiHVz6mC3s2BA7HH8h7BTiG8B5NZRrgh0wSpVYIMn1nb0v2kMEH5dg1L3BndaA/exec'; // 💡여기에 2026년용 배포 주소를 넣으세요!
 const CLIENT_ID = '132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleusercontent.com';
 
 let idToken = null;
@@ -359,9 +384,12 @@ function showLoginNotice(msg, isError) {
   const el = document.getElementById('login-status'); el.textContent = msg; el.style.color = isError ? '#ef4444' : '#10b981';
 }
 
+// ⭐ 스크롤 리셋 기능이 포함된 화면 전환 함수
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
+  // 화면을 전환할 때 항상 맨 위로 스크롤을 올려줍니다.
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function callApi(action, extraData = {}) {
