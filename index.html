@@ -20,26 +20,32 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
 
-/* 화면 전환 */
-.screen { display: none !important; opacity: 0; transition: opacity 0.25s ease; }
-.screen.active { display: block !important; opacity: 1; }
+/* =======================================
+   화면 전환 및 스크롤 겹침 버그 완벽 해결
+======================================= */
+/* 1) 모든 스크린은 기본적으로 완벽히 숨김 */
+.screen { display: none !important; opacity: 0; }
+/* 2) 활성화된 스크린만 보이도록 처리 (부드러운 페이드인 애니메이션 추가) */
+.screen.active { display: block !important; opacity: 1; animation: fadeIn 0.3s ease; }
+/* 3) 중앙 정렬(로그인, 대문 등)이 필요한 화면이 활성화되었을 때만 flex 적용 */
+.screen.active#sc-login,
+.screen.active.center-wrap { display: flex !important; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* 로그인 화면 */
-#sc-login { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 20px; }
-#sc-login:not(.active) { display: none !important; }
+#sc-login { min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
 .login-card { background: var(--surface); border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; border-top: 8px solid var(--navy); }
 
 /* 포털 및 메뉴 화면 공통 */
-.center-wrap { min-height: 100vh; display: flex !important; padding: 40px 20px; }
+.center-wrap { min-height: 100vh; padding: 40px 20px; }
 .center-wrap > .portal-container { margin: auto; max-width: 1000px; width: 100%; }
 .menu-grid { display: grid; gap: 16px; margin-top: 24px; }
 .menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
 .menu-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); }
 .badge { font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px; width: fit-content; margin-bottom: 12px; }
 
-/* =======================================
-   새로 디자인된 입학년도 선택 대문 (Year Card) 
-======================================= */
+/* 입학년도 선택 대문 (Year Card) */
 .year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 32px; }
 .year-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
@@ -48,12 +54,10 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
   box-shadow: 0 4px 10px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center;
   position: relative; z-index: 1;
 }
-/* 마우스 오버 시 확 커지는 애니메이션 */
 .year-card:hover { 
-  transform: scale(1.08); /* 크기 8% 확대 */
+  transform: scale(1.08); 
   box-shadow: 0 25px 30px -5px rgba(0,0,0,0.15), 0 15px 15px -5px rgba(0,0,0,0.08); 
-  border-color: var(--navy); 
-  z-index: 10; 
+  border-color: var(--navy); z-index: 10; 
 }
 .year-card.highlight { border: 3px solid var(--navy); background: linear-gradient(to bottom, #ffffff, #f4f8fc); }
 .year-card.disabled { opacity: 0.55; cursor: not-allowed; background: #f8fafc; }
@@ -63,7 +67,7 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 .year-desc { font-size: 0.95em; color: var(--text-sub); line-height: 1.6; }
 
 /* 메인 앱 영역 */
-.app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px; }
+.app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px 40px; }
 .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .btn-back { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
 .btn-back:hover { background: #e2e8f0; }
@@ -172,7 +176,6 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
     </div>
     
     <div class="year-grid">
-      
       <div class="year-card" onclick="window.open('https://script.google.com/a/macros/pess.cnehs.kr/s/AKfycbw3OJYxvInH1dRXjO-zZwPpuR70aSPbMByvbZIMHIgpChy5vt6lKwggM-CUryASd2BSWg/exec', '_blank')">
         <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용 시스템</span>
         <div class="year-title">2025학년도 입학생</div>
@@ -190,7 +193,6 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
         <div class="year-title">2027학년도 입학생</div>
         <div class="year-desc">내년도 입학생을 위한 시스템으로 현재는 접근하실 수 없습니다.</div>
       </div>
-
     </div>
   </div>
 </div>
@@ -310,7 +312,6 @@ const CLIENT_ID = '132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleuser
 let idToken = null;
 let studentInfo = null;
 
-// [2026 고유 데이터] 위계성 규칙 및 진로 가이드
 const semesterOrder = ["t1_1", "t1_2", "t2_1", "t2_2", "t3_1", "t3_2"];
 const hierarchyMap = { "역학과 에너지": "물리학", "전자기와 양자": "물리학", "물질과 에너지": "화학", "화학 반응의 세계": "화학", "세포와 물질대사": "생명과학", "생물의 유전": "생명과학", "지구시스템과학": "지구과학", "행성우주과학": "지구과학" };
 const coreGuide = {
@@ -344,9 +345,6 @@ const curriculum = {
 
 const ALL_GROUP_IDS = ['s1_1','s1_2','s2_art1','s2_lib1','s4','s2_art2','s2_lib2','s5','s3_art1','s6','s3_art2','s7','s8'];
 
-// ==========================================
-// Google 로그인 & GAS 통신 엔진
-// ==========================================
 window.addEventListener('load', () => {
   const checkGoogle = setInterval(() => {
     if (typeof google !== 'undefined' && google.accounts) {
@@ -370,7 +368,6 @@ function handleGoogleCredential(response) {
     callApi('getStudent').then(res => {
       if (res.ok) {
         studentInfo = res;
-        // 메인 포털 대문으로 이동
         document.getElementById('user-display-main').textContent = `${res.studentId} ${res.name} (${res.email})`;
         showScreen('sc-main-portal');
       } else {
@@ -384,12 +381,11 @@ function showLoginNotice(msg, isError) {
   const el = document.getElementById('login-status'); el.textContent = msg; el.style.color = isError ? '#ef4444' : '#10b981';
 }
 
-// ⭐ 스크롤 리셋 기능이 포함된 화면 전환 함수
+// ⭐ 화면이 바뀔 때 무조건 최상단(스크롤 0)으로 끌어올리는 기능이 추가됨
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
-  // 화면을 전환할 때 항상 맨 위로 스크롤을 올려줍니다.
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' }); // 최상단 스크롤 리셋
 }
 
 function callApi(action, extraData = {}) {
@@ -416,9 +412,6 @@ function chooseMenu2026(type) {
   }
 }
 
-// ==========================================
-// [2026 고유 로직] 시뮬레이터 렌더링 및 프리셋
-// ==========================================
 function renderSimulator() {
   const tabBar = document.getElementById('tab-bar'); const contentArea = document.getElementById('content-area');
   tabBar.innerHTML = ''; contentArea.innerHTML = '';
@@ -495,9 +488,6 @@ function handleSelect(el, limit) {
   updateUI();
 }
 
-// ==========================================
-// [2026 고유 연산] 위계성 / 중복 차단 / 학점 합계
-// ==========================================
 function updateUI() {
   let stats = { fixed: 0, select: 0, kms: 0, soc: 0, sci: 0, art: 0, pe: 0, lib: 0 };
   const selBySem = {};
@@ -516,10 +506,8 @@ function updateUI() {
     const name = input.getAttribute('data-name'); const sem = input.getAttribute('data-semester'); const idx = semesterOrder.indexOf(sem);
     const card = input.closest('.subject-card');
     
-    // 학기 간 중복 선택 검증
     let isUsed = false; semesterOrder.forEach(s => { if (s !== sem && selBySem[s].includes(name)) isUsed = true; });
     
-    // 선수과목 위계성 검증
     let isBlocked = false;
     if (hierarchyMap[name]) {
       const req = hierarchyMap[name]; let ok = false;
@@ -574,9 +562,6 @@ function buildReport() {
   });
 }
 
-// ==========================================
-// 기존 내역 연동 및 서버 최종 제출
-// ==========================================
 function fetchSavedData() {
   callApi('getSubmission').then(res => {
     if (res.ok && res.hasSubmitted) {
@@ -628,9 +613,6 @@ async function submitToServer() {
   btn.disabled = false;
 }
 
-// ==========================================
-// 내역 출력 및 엑셀 / 이미지 변환
-// ==========================================
 function exportToExcel() {
   const data = [["학기", "진로", document.getElementById('career-name').value], ["학기", "과목명", "유형", "학점", "이수구분"]];
   semesterOrder.forEach(sem => {
