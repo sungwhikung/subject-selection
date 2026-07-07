@@ -432,8 +432,8 @@ function renderSimulator() {
     curriculum[sem].choices.forEach(ch => {
       cHtml += `<div class="section-title">${ch.name}</div><div class="choice-grid">`;
       ch.list.forEach(item => {
-        const hMsg = hierarchyMap[item.n] ? `<span style="color:#ef4444; font-size:11px; display:block; font-weight:800; margin-top:6px;">⚠️ ${hierarchyMap[item.n]} 선수이수 필수</span>` : "";
-        const univIcon = coreGuide[item.n] ? `<span class="recomm-badge" title="${coreGuide[item.n]}">⭐</span>` : "";
+        const hMsg = hierarchyMap[item.n] ? `<span style="color:#ef4444; font-size:11px; display:block; font-weight:800; margin-top:6px;"> ${hierarchyMap[item.n]} 선수이수 필수</span>` : "";
+        const univIcon = coreGuide[item.n] ? `<span class="recomm-badge" title="${coreGuide[item.n]}"></span>` : "";
         cHtml += `<label class="subject-card bg-${item.g}" data-subname="${item.n}"><input type="checkbox" class="${ch.id}" data-semester="${sem}" data-name="${item.n}" data-group="${item.g}" data-type="${item.t}" value="${item.c}" onchange="handleSelect(this, ${ch.limit})"> <div style="flex:1;"><strong style="font-size:1.02em;">${item.n}</strong><div style="color:var(--text-sub); margin-top:4px;">${item.c}학점 | ${item.t}</div>${hMsg}</div>${univIcon}</label>`;
       });
       cHtml += `</div>`;
