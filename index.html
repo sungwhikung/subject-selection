@@ -441,7 +441,7 @@ function renderSimulator() {
     div.innerHTML = fHtml + cHtml; contentArea.appendChild(div);
   });
   
-  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '📊 최종 설계서 제출';
+  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '최종 설계서 제출';
   finalBtn.onclick = () => openTab('final'); tabBar.appendChild(finalBtn);
   updateUI();
 }
